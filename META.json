@@ -43,6 +43,8 @@
             "Plack::Runner" : "0",
             "String::Errf" : "0",
             "Template" : "0",
+            "Text::Markdown" : "0",
+            "Text::Textile" : "0",
             "Try::Tiny" : "0",
             "YAML::XS" : "0",
             "autodie" : "0",
@@ -87,7 +89,7 @@
          "web" : "http://github.com/genehack/HiD"
       }
    },
-   "version" : "0.1",
+   "version" : "0.2",
    "x_Dist_Zilla" : {
       "plugins" : [
          {
@@ -309,6 +311,17 @@
             "class" : "Dist::Zilla::Plugin::ArchiveRelease",
             "name" : "@Filter/ArchiveRelease",
             "version" : "4.00"
+         },
+         {
+            "class" : "Dist::Zilla::Plugin::Prereqs",
+            "config" : {
+               "Dist::Zilla::Plugin::Prereqs" : {
+                  "phase" : "runtime",
+                  "type" : "requires"
+               }
+            },
+            "name" : "Prereqs",
+            "version" : "4.300016"
          },
          {
             "class" : "Dist::Zilla::Plugin::FinderCode",

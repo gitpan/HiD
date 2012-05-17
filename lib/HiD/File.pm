@@ -3,7 +3,7 @@
 
 package HiD::File;
 {
-  $HiD::File::VERSION = '0.1';
+  $HiD::File::VERSION = '0.2';
 }
 BEGIN {
   $HiD::File::AUTHORITY = 'cpan:GENEHACK';
@@ -81,7 +81,7 @@ well if you're trying to figure out how an object from this class works.
 
 =head1 VERSION
 
-version 0.1
+version 0.2
 
 =head1 AUTHOR
 

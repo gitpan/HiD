@@ -57,6 +57,8 @@ my %WriteMakefileArgs = (
     "Plack::Runner" => 0,
     "String::Errf" => 0,
     "Template" => 0,
+    "Text::Markdown" => 0,
+    "Text::Textile" => 0,
     "Try::Tiny" => 0,
     "YAML::XS" => 0,
     "autodie" => 0,
@@ -69,7 +71,7 @@ my %WriteMakefileArgs = (
     "utf8" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.1",
+  "VERSION" => "0.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
