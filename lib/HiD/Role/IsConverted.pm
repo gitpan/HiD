@@ -3,7 +3,7 @@
 
 package HiD::Role::IsConverted;
 {
-  $HiD::Role::IsConverted::VERSION = '0.2';
+  $HiD::Role::IsConverted::VERSION = '0.3';
 }
 BEGIN {
   $HiD::Role::IsConverted::AUTHORITY = 'cpan:GENEHACK';
@@ -150,9 +150,12 @@ around BUILDARGS => sub {
       ( $metadata , $content ) = $file_content
         =~ /^---\n?(.*?)---\n?(.*)$/ms;
     }
+    elsif ( $args{input_filename} =~ /\.html?$/ ) {
+      die "plain HTML file without YAML front matter"
+    }
     else {
       $content  = $file_content;
-      $metadata = ''
+      $metadata = '';
     }
 
     $args{content}  = $content;
@@ -224,7 +227,7 @@ Data for passing to template processing function.
 
 =head1 VERSION
 
-version 0.2
+version 0.3
 
 =head1 AUTHOR
 

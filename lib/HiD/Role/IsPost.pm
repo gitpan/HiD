@@ -3,7 +3,7 @@
 
 package HiD::Role::IsPost;
 {
-  $HiD::Role::IsPost::VERSION = '0.2';
+  $HiD::Role::IsPost::VERSION = '0.3';
 }
 BEGIN {
   $HiD::Role::IsPost::AUTHORITY = 'cpan:GENEHACK';
@@ -179,7 +179,7 @@ DateTime object for this post.
 
 =head1 VERSION
 
-version 0.2
+version 0.3
 
 =head1 AUTHOR
 

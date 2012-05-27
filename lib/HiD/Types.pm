@@ -3,7 +3,7 @@
 
 package HiD::Types;
 {
-  $HiD::Types::VERSION = '0.2';
+  $HiD::Types::VERSION = '0.3';
 }
 BEGIN {
   $HiD::Types::AUTHORITY = 'cpan:GENEHACK';
@@ -58,7 +58,7 @@ Type constraints for HiD.
 
 =head1 VERSION
 
-version 0.2
+version 0.3
 
 =head1 AUTHOR
 

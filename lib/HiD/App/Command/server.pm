@@ -3,7 +3,7 @@
 
 package HiD::App::Command::server;
 {
-  $HiD::App::Command::server::VERSION = '0.2';
+  $HiD::App::Command::server::VERSION = '0.3';
 }
 BEGIN {
   $HiD::App::Command::server::AUTHORITY = 'cpan:GENEHACK';
@@ -68,6 +68,13 @@ sub locate_file  {
 
   my $path = $env->{PATH_INFO} || '';
 
+  $path =~ s|^/||;
+
+  if ( -e -d $path ) {
+    $path .= '/' unless $path =~ m|/$|;
+    $env->{PATH_INFO} .= '/';
+  }
+
   $env->{PATH_INFO} .= 'index.html'
     if ( $path && $path =~ m|/$| );
 
@@ -107,7 +114,7 @@ sub commands.
 
 =head1 VERSION
 
-version 0.2
+version 0.3
 
 =head1 AUTHOR
 

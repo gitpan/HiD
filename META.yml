@@ -65,7 +65,7 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=HiD
   homepage: http://search.cpan.org/dist/HiD/
   repository: git://github.com/genehack/HiD.git
-version: 0.2
+version: 0.3
 x_Dist_Zilla:
   plugins:
     -
@@ -227,7 +227,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::Twitter
       name: '@Filter/Twitter'
-      version: 0.015
+      version: 0.016
     -
       class: Dist::Zilla::Plugin::Git::Commit
       name: '@Filter/Git::Commit'

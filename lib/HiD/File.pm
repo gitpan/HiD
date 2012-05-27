@@ -3,7 +3,7 @@
 
 package HiD::File;
 {
-  $HiD::File::VERSION = '0.2';
+  $HiD::File::VERSION = '0.3';
 }
 BEGIN {
   $HiD::File::AUTHORITY = 'cpan:GENEHACK';
@@ -37,12 +37,7 @@ sub publish {
 }
 
 # used to populate the 'url' attr in Role::IsPublished
-sub _build_url {
-  my $self = shift;
-
-  return ( $self->basename eq 'index' )
-    ? $self->input_path : $self->input_filename;
-}
+sub _build_url { return shift->input_filename }
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -81,7 +76,7 @@ well if you're trying to figure out how an object from this class works.
 
 =head1 VERSION
 
-version 0.2
+version 0.3
 
 =head1 AUTHOR
 
