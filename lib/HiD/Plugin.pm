@@ -1,28 +1,26 @@
-# ABSTRACT: Static website generation system
+# ABSTRACT: Plugin
 
 
-package HiD::App;
+package HiD::Plugin;
 {
-  $HiD::App::VERSION = '0.4';
+  $HiD::Plugin::VERSION = '0.4';
 }
 BEGIN {
-  $HiD::App::AUTHORITY = 'cpan:GENEHACK';
+  $HiD::Plugin::AUTHORITY = 'cpan:GENEHACK';
 }
+
 use Moose;
-extends 'MooseX::App::Cmd';
 use namespace::autoclean;
 
 use 5.014;
 use utf8;
 use autodie;
-use warnings    qw/ FATAL  utf8     /;
-use open        qw/ :std  :utf8     /;
+use warnings qw/ FATAL utf8 /;
 use charnames   qw/ :full           /;
-use feature     qw/ unicode_strings /;
+use feature  qw/ unicode_strings /;
 
-sub default_command { 'publish' };
+sub after_publish { 1 }
 
-__PACKAGE__->meta->make_immutable;
 1;
 
 __END__
@@ -33,11 +31,16 @@ __END__
 
 =head1 NAME
 
-HiD::App - Static website generation system
+HiD::Plugin - Plugin
 
 =head1 SYNOPSIS
 
-See C<perldoc hid> for usage information.
+    my $plugin = HiD::Plugin;
+    $plugin->after_publish($hid);
+
+=head1 DESCRIPTION
+
+Class representing a "Plugin" object.
 
 =head1 VERSION
 

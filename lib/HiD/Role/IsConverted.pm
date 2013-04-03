@@ -3,7 +3,7 @@
 
 package HiD::Role::IsConverted;
 {
-  $HiD::Role::IsConverted::VERSION = '0.3';
+  $HiD::Role::IsConverted::VERSION = '0.4';
 }
 BEGIN {
   $HiD::Role::IsConverted::AUTHORITY = 'cpan:GENEHACK';
@@ -21,8 +21,10 @@ use feature     qw/ unicode_strings /;
 
 use Carp;
 use Class::Load  qw/ :all /;
+use File::Slurp  qw/ read_file /;
 use HiD::Types;
 use YAML::XS     qw/ Load /;
+use Encode;
 
 requires 'get_default_layout';
 
@@ -135,15 +137,7 @@ around BUILDARGS => sub {
   my %args = ( ref $_[0] and ref $_[0] eq 'HASH' ) ? %{ $_[0] } : @_;
 
   unless ( $args{content} and $args{metadata} ) {
-    open( my $IN , '<' , $args{input_filename} )
-      or confess "$! $args{input_filename}";
-
-    my $file_content;
-    {
-      local $/;
-      $file_content .= <$IN>;
-    }
-    close( $IN );
+    my $file_content = read_file( $args{input_filename}, binmode => ':utf8' );
 
     my( $metadata , $content );
     if ( $file_content =~ /^---/ ) {
@@ -159,7 +153,7 @@ around BUILDARGS => sub {
     }
 
     $args{content}  = $content;
-    $args{metadata} = Load( $metadata ) // {};
+    $args{metadata} = Load( encode('utf8',$metadata) ) // {};
   }
 
   return $class->$orig( \%args );
@@ -169,6 +163,7 @@ no Moose::Role;
 1;
 
 __END__
+
 =pod
 
 =encoding utf-8
@@ -227,7 +222,7 @@ Data for passing to template processing function.
 
 =head1 VERSION
 
-version 0.3
+version 0.4
 
 =head1 AUTHOR
 
@@ -241,4 +236,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

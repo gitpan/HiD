@@ -3,7 +3,7 @@
 
 package HiD::Processor::Template;
 {
-  $HiD::Processor::Template::VERSION = '0.3';
+  $HiD::Processor::Template::VERSION = '0.4';
 }
 BEGIN {
   $HiD::Processor::Template::AUTHORITY = 'cpan:GENEHACK';
@@ -25,7 +25,7 @@ use Template;
 has 'tt' => (
   is       => 'ro' ,
   isa      => 'Template' ,
-  handles  => [ qw/ process / ],
+  handles  => [ qw/ process error / ],
   required => 1 ,
 );
 
@@ -44,6 +44,7 @@ __PACKAGE__->meta->make_immutable;
 1;
 
 __END__
+
 =pod
 
 =encoding utf-8
@@ -62,7 +63,7 @@ Wraps up a L<Template> object and allows it to be used during HiD publication.
 
 =head1 VERSION
 
-version 0.3
+version 0.4
 
 =head1 AUTHOR
 
@@ -76,4 +77,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

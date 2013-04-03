@@ -3,7 +3,7 @@
 
 package HiD::Role::IsPublished;
 {
-  $HiD::Role::IsPublished::VERSION = '0.3';
+  $HiD::Role::IsPublished::VERSION = '0.4';
 }
 BEGIN {
   $HiD::Role::IsPublished::AUTHORITY = 'cpan:GENEHACK';
@@ -111,6 +111,7 @@ no Moose::Role;
 1;
 
 __END__
+
 =pod
 
 =encoding utf-8
@@ -171,7 +172,7 @@ The URL to the output path for the written file.
 
 =head1 VERSION
 
-version 0.3
+version 0.4
 
 =head1 AUTHOR
 
@@ -185,4 +186,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

@@ -3,7 +3,7 @@
 
 package HiD::File;
 {
-  $HiD::File::VERSION = '0.3';
+  $HiD::File::VERSION = '0.4';
 }
 BEGIN {
   $HiD::File::AUTHORITY = 'cpan:GENEHACK';
@@ -20,10 +20,10 @@ use open        qw/ :std  :utf8     /;
 use charnames   qw/ :full           /;
 use feature     qw/ unicode_strings /;
 
-use File::Basename  qw/ fileparse /;
-use File::Copy      qw/ copy /;
-use File::Path      qw/ make_path /;
-use Path::Class     qw/ file / ;
+use File::Basename         qw/ fileparse /;
+use File::Copy::Recursive  qw/ fcopy /;
+use File::Path             qw/ make_path /;
+use Path::Class            qw/ file / ;
 
 
 sub publish {
@@ -33,7 +33,8 @@ sub publish {
 
   make_path $dir unless -d $dir;
 
-  copy( $self->input_filename , $self->output_filename ) or die $!;
+  fcopy( $self->input_filename , $self->output_filename )
+    or die $!;
 }
 
 # used to populate the 'url' attr in Role::IsPublished
@@ -43,6 +44,7 @@ __PACKAGE__->meta->make_immutable;
 1;
 
 __END__
+
 =pod
 
 =encoding utf-8
@@ -76,7 +78,7 @@ well if you're trying to figure out how an object from this class works.
 
 =head1 VERSION
 
-version 0.3
+version 0.4
 
 =head1 AUTHOR
 
@@ -90,4 +92,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

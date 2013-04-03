@@ -20,6 +20,7 @@ lib/HiD/App/Command/server.pm
 lib/HiD/File.pm
 lib/HiD/Layout.pm
 lib/HiD/Page.pm
+lib/HiD/Plugin.pm
 lib/HiD/Post.pm
 lib/HiD/Processor.pm
 lib/HiD/Processor/Template.pm

@@ -3,7 +3,7 @@
 
 package HiD::App::Command::publish;
 {
-  $HiD::App::Command::publish::VERSION = '0.3';
+  $HiD::App::Command::publish::VERSION = '0.4';
 }
 BEGIN {
   $HiD::App::Command::publish::AUTHORITY = 'cpan:GENEHACK';
@@ -43,6 +43,7 @@ __PACKAGE__->meta->make_immutable;
 1;
 
 __END__
+
 =pod
 
 =encoding utf-8
@@ -77,7 +78,7 @@ sub commands.
 
 =head1 VERSION
 
-version 0.3
+version 0.4
 
 =head1 AUTHOR
 
@@ -91,4 +92,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

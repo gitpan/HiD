@@ -3,7 +3,7 @@
 
 package HiD::Layout;
 {
-  $HiD::Layout::VERSION = '0.3';
+  $HiD::Layout::VERSION = '0.4';
 }
 BEGIN {
   $HiD::Layout::AUTHORITY = 'cpan:GENEHACK';
@@ -22,6 +22,7 @@ use feature     qw/ unicode_strings /;
 use File::Slurp qw/ read_file / ;
 use HiD::Types;
 use YAML::XS;
+use Encode;
 
 
 has content => (
@@ -69,6 +70,10 @@ has processor => (
   is       => 'ro',
   isa      => 'Object' ,
   required => 1 ,
+  handles  => {
+    process_template => 'process' ,
+    processor_error  => 'error' ,
+  },
 );
 
 
@@ -81,14 +86,14 @@ sub BUILDARGS {
     ( $args{name} , $args{ext} ) = $args{filename}
       =~ m|^.*/(.+)\.([^.]+)$|;
 
-    my $content  = read_file( $args{filename} );
+    my $content  = read_file( $args{filename}, binmode => ':utf8' );
     my $metadata = {};
 
     if ( $content =~ /^---\n/s ) {
       my $meta;
       ( $meta , $content ) = ( $content )
         =~ m|^---\n(.*?)---\n(.*)$|s;
-      $metadata = Load( $meta ) if $meta;
+      $metadata = Load( encode('utf8', $meta) ) if $meta;
     }
 
     $args{metadata} = $metadata;
@@ -112,21 +117,21 @@ sub render {
   my $processed_input_content;
   my $input_content = delete $data->{content};
 
-  $self->processor->process(
+  $self->process_template(
     \$input_content ,
     $data ,
     \$processed_input_content ,
-  ) or die $self->processor->tt->error;
+  ) or die $self->processor_error;
 
   $data->{content} = $processed_input_content;
 
   my $output;
 
-  $self->processor->process(
+  $self->process_template(
     \$self->content ,
     $data ,
     \$output ,
-  ) or die $self->processor->error;
+  ) or die $self->processor_error;
 
   if ( my $embedded_layout = $self->layout ) {
     $data->{content} = $output;
@@ -140,6 +145,7 @@ __PACKAGE__->meta->make_immutable;
 1;
 
 __END__
+
 =pod
 
 =encoding utf-8
@@ -202,7 +208,7 @@ Will recurse into embedded layouts as needed.
 
 =head1 VERSION
 
-version 0.3
+version 0.4
 
 =head1 AUTHOR
 
@@ -216,4 +222,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-

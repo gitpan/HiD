@@ -3,7 +3,7 @@
 
 package HiD::Page;
 {
-  $HiD::Page::VERSION = '0.3';
+  $HiD::Page::VERSION = '0.4';
 }
 BEGIN {
   $HiD::Page::AUTHORITY = 'cpan:GENEHACK';
@@ -36,7 +36,7 @@ sub publish {
 
   make_path $dir unless -d $dir;
 
-  open( my $out , '>' , $self->output_filename ) or die $!;
+  open( my $out , '>:utf8' , $self->output_filename ) or die $!;
   print $out $self->rendered_content;
   close( $out );
 }
@@ -69,6 +69,7 @@ __PACKAGE__->meta->make_immutable;
 1;
 
 __END__
+
 =pod
 
 =encoding utf-8
@@ -111,7 +112,7 @@ object from this class works.
 
 =head1 VERSION
 
-version 0.3
+version 0.4
 
 =head1 AUTHOR
 
@@ -125,4 +126,3 @@ This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
