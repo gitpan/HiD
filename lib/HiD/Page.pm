@@ -3,7 +3,7 @@
 
 package HiD::Page;
 {
-  $HiD::Page::VERSION = '0.4';
+  $HiD::Page::VERSION = '0.5';
 }
 BEGIN {
   $HiD::Page::AUTHORITY = 'cpan:GENEHACK';
@@ -112,7 +112,7 @@ object from this class works.
 
 =head1 VERSION
 
-version 0.4
+version 0.5
 
 =head1 AUTHOR
 

@@ -3,7 +3,7 @@
 
 package HiD::App::Command::server;
 {
-  $HiD::App::Command::server::VERSION = '0.4';
+  $HiD::App::Command::server::VERSION = '0.5';
 }
 BEGIN {
   $HiD::App::Command::server::AUTHORITY = 'cpan:GENEHACK';
@@ -115,7 +115,7 @@ sub commands.
 
 =head1 VERSION
 
-version 0.4
+version 0.5
 
 =head1 AUTHOR
 
