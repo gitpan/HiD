@@ -3,7 +3,7 @@
 
 package HiD::Post;
 {
-  $HiD::Post::VERSION = '0.5';
+  $HiD::Post::VERSION = '0.6';
 }
 BEGIN {
   $HiD::Post::AUTHORITY = 'cpan:GENEHACK';
@@ -144,7 +144,7 @@ disk -- this data from this object.
 
 =head1 VERSION
 
-version 0.5
+version 0.6
 
 =head1 AUTHOR
 
