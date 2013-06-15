@@ -67,7 +67,7 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=HiD
   homepage: http://search.cpan.org/dist/HiD/
   repository: git://github.com/ChinaXing/HiD.git
-version: 0.6
+version: 0.7
 x_Dist_Zilla:
   perl:
     version: 5.017010
@@ -228,10 +228,6 @@ x_Dist_Zilla:
       class: Dist::Zilla::Plugin::Test::Compile
       name: '@Filter/Test::Compile'
       version: 2.001
-    -
-      class: Dist::Zilla::Plugin::Twitter
-      name: '@Filter/Twitter'
-      version: 0.020
     -
       class: Dist::Zilla::Plugin::Git::Commit
       name: '@Filter/Git::Commit'

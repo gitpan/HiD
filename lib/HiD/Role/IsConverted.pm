@@ -3,7 +3,7 @@
 
 package HiD::Role::IsConverted;
 {
-  $HiD::Role::IsConverted::VERSION = '0.6';
+  $HiD::Role::IsConverted::VERSION = '0.7';
 }
 BEGIN {
   $HiD::Role::IsConverted::AUTHORITY = 'cpan:GENEHACK';
@@ -121,7 +121,7 @@ has template_data => (
       site     => $self->hid ,
     };
 
-    foreach my $method ( qw/ title url / ) {
+    foreach my $method ( qw/ title url categories tags/ ) {
       $data->{page}{$method} = $self->$method
         if $self->can( $method );
     }
@@ -222,7 +222,7 @@ Data for passing to template processing function.
 
 =head1 VERSION
 
-version 0.6
+version 0.7
 
 =head1 AUTHOR
 

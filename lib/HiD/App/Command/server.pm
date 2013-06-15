@@ -3,7 +3,7 @@
 
 package HiD::App::Command::server;
 {
-  $HiD::App::Command::server::VERSION = '0.6';
+  $HiD::App::Command::server::VERSION = '0.7';
 }
 BEGIN {
   $HiD::App::Command::server::AUTHORITY = 'cpan:GENEHACK';
@@ -44,6 +44,15 @@ sub _build_port {
   return $self->config->{server_port} // 5000;
 }
 
+
+has auto_refresh => (
+    is          => 'ro',
+    isa         => 'Bool',
+    traits      => ['Getopt'],
+    cmd_aliases => 'auto',
+    lazy        => 1,
+    default     => 0,
+);
 sub _run {
   my( $self , $opts , $args ) = @_;
 
@@ -51,8 +60,34 @@ sub _run {
 
   my $app = HiD::Server->new( root => $self->destination )->to_app;
 
-  my $runner = Plack::Runner->new();
-  $runner->parse_options( '-p' , $self->port );
+  my %args = ( -p => $self->port );
+
+  # auto refresh
+  if ( $self->auto_refresh ) {
+      my @dirs;
+
+      # posts, include and layout
+      for my $dir (qw/posts_dir include_dir layout_dir/) {
+           push @dirs, $self->hid->get_config($dir);
+      }
+
+      # regular_files and pages
+      for my $dir (qw/pages regular_files/) {
+          push @dirs, map { $_->input_filename } @{ $self->hid->$dir };
+      }
+
+      $args{'-R'} = join ',', @dirs;
+      $args{'-r'} = 1;
+      my $_app = $app;
+      $app = \sub {
+          say 'Rebuild ... ';
+          $self->publish;
+          $_app;
+      };
+  }
+
+  my $runner = Plack::Runner->new;
+  $runner->parse_options(%args);
   $runner->run($app);
 }
 
@@ -108,6 +143,10 @@ Start a Plack-based web server that serves your C<destination> directory.
 
 Port number to bind. Defaults to 5000.
 
+=head2 auto_refresh
+
+Automatically refresh result when source file/dir changed, just likey jekyll
+
 =head1 SEE ALSO
 
 See L<HiD::App::Command> for additional command line options supported by all
@@ -115,7 +154,7 @@ sub commands.
 
 =head1 VERSION
 
-version 0.6
+version 0.7
 
 =head1 AUTHOR
 
