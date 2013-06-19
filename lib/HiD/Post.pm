@@ -3,7 +3,7 @@
 
 package HiD::Post;
 {
-  $HiD::Post::VERSION = '0.8';
+  $HiD::Post::VERSION = '0.9';
 }
 BEGIN {
   $HiD::Post::AUTHORITY = 'cpan:GENEHACK';
@@ -58,7 +58,7 @@ sub publish {
     my $output_dir_depth = () = $dir =~ m!/!g;
     if ( my $add_dir = "../" x ( $output_dir_depth - $input_dir_depth ) ) {
         print $out $self->rendered_content =~
-          s#src="(?!(?:[^:]+:/)?/)([^"]+)#src="$add_dir$1#gr;
+          s#src="(?!https?://|/)([^"]+)#src="$add_dir$1#gr;
     }
     else {
         print $out $self->rendered_content;
@@ -144,7 +144,7 @@ disk -- this data from this object.
 
 =head1 VERSION
 
-version 0.8
+version 0.9
 
 =head1 AUTHOR
 

@@ -3,7 +3,7 @@
 
 package HiD;
 {
-  $HiD::VERSION = '0.8';
+  $HiD::VERSION = '0.9';
 }
 BEGIN {
   $HiD::AUTHORITY = 'cpan:GENEHACK';
@@ -748,7 +748,7 @@ L<StaticVolt>
 
 =head1 VERSION
 
-version 0.8
+version 0.9
 
 =head1 AUTHOR
 
