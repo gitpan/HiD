@@ -3,7 +3,7 @@
 
 package HiD::Role::IsConverted;
 {
-  $HiD::Role::IsConverted::VERSION = '0.7';
+  $HiD::Role::IsConverted::VERSION = '0.8';
 }
 BEGIN {
   $HiD::Role::IsConverted::AUTHORITY = 'cpan:GENEHACK';
@@ -222,7 +222,7 @@ Data for passing to template processing function.
 
 =head1 VERSION
 
-version 0.7
+version 0.8
 
 =head1 AUTHOR
 

@@ -22,6 +22,7 @@ my %WriteMakefileArgs = (
   "LICENSE" => "perl",
   "NAME" => "HiD",
   "PREREQ_PM" => {
+    "AnyEvent::Filesys::Notify" => 0,
     "Carp" => 0,
     "Class::Load" => 0,
     "DDP" => 0,
@@ -74,7 +75,7 @@ my %WriteMakefileArgs = (
     "Test::Warn" => 0,
     "YAML" => 0
   },
-  "VERSION" => "0.7",
+  "VERSION" => "0.8",
   "test" => {
     "TESTS" => "t/*.t"
   }
