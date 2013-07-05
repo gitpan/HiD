@@ -3,7 +3,7 @@
 
 package HiD::Role::IsPost;
 {
-  $HiD::Role::IsPost::VERSION = '0.9';
+  $HiD::Role::IsPost::VERSION = '0.4';
 }
 BEGIN {
   $HiD::Role::IsPost::AUTHORITY = 'cpan:GENEHACK';
@@ -94,26 +94,11 @@ has date => (
 );
 
 
+### TODO parse tags out of metadata
 has tags => (
   is      => 'ro' ,
   isa     => 'ArrayRef',
-  default => sub {
-    my $self = shift;
-
-    if ( my $tag = $self->get_metadata( 'tag' )) {
-      return [ $tag ];
-    }
-    elsif ( my $tags = $self->get_metadata( 'tags' )) {
-      if ( ref $tags ) {
-        return [ @$tags ];
-      }
-      else {
-        my @tags = split /\s/ , $tags;
-        return [ @tags ];
-      }
-    }
-    else { return [] }
-  } ,
+  default => sub {[]} ,
 );
 
 
@@ -195,7 +180,7 @@ DateTime object for this post.
 
 =head1 VERSION
 
-version 0.9
+version 0.4
 
 =head1 AUTHOR
 

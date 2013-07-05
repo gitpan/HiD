@@ -3,7 +3,7 @@
 
 package HiD::Processor;
 {
-  $HiD::Processor::VERSION = '0.9';
+  $HiD::Processor::VERSION = '0.4';
 }
 BEGIN {
   $HiD::Processor::AUTHORITY = 'cpan:GENEHACK';
@@ -51,7 +51,7 @@ implements a 'process' method.
 
 =head1 VERSION
 
-version 0.9
+version 0.4
 
 =head1 AUTHOR
 

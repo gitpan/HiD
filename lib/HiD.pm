@@ -3,7 +3,7 @@
 
 package HiD;
 {
-  $HiD::VERSION = '0.9';
+  $HiD::VERSION = '0.4';
 }
 BEGIN {
   $HiD::AUTHORITY = 'cpan:GENEHACK';
@@ -16,89 +16,96 @@ use utf8;
 use strict;
 use autodie;
 use warnings;
-use warnings qw/ FATAL  utf8     /;
-use open qw/ :std  :utf8     /;
-use charnames qw/ :full           /;
-use feature qw/ unicode_strings /;
+use warnings    qw/ FATAL  utf8     /;
+use open        qw/ :std  :utf8     /;
+use charnames   qw/ :full           /;
+use feature     qw/ unicode_strings /;
 
-use Class::Load qw/ :all /;
+use Class::Load        qw/ :all /;
 use File::Basename;
 use File::Find::Rule;
-use File::Path qw/ make_path /;
-use File::Remove qw/ remove /;
+use File::Path         qw/ make_path /;
+use File::Remove       qw/ remove /;
 use HiD::File;
 use HiD::Layout;
 use HiD::Page;
 use HiD::Post;
 use HiD::Types;
-use Path::Class qw/ file /;
+use Path::Class        qw/ file /;
 use Try::Tiny;
-use YAML::XS qw/ LoadFile /;
-use Module::Find;
+use YAML::XS           qw/ LoadFile /;
 
 
-has cli_opts =>
-  (is => 'ro', isa => 'HashRef', lazy => 1, default => sub { {} },);
+has cli_opts => (
+  is      => 'ro' ,
+  isa     => 'HashRef' ,
+  lazy    => 1 ,
+  default => sub {{}} ,
+);
 
 
 has config => (
-  is      => 'ro',
-  isa     => 'HashRef',
-  traits  => ['Hash'],
-  lazy    => 1,
-  builder => '_build_config',
-  handles => {get_config => 'get',}
+  is      => 'ro' ,
+  isa     => 'HashRef' ,
+  traits  => [ 'Hash' ],
+  lazy    => 1 ,
+  builder => '_build_config' ,
+  handles => {
+    get_config => 'get' ,
+  }
 );
 
 sub _build_config {
   my $self = shift;
 
-  my ($config, $config_loaded);
+  my( $config , $config_loaded );
 
-  if (my $file = $self->config_file) {
+  if ( my $file = $self->config_file ) {
     try {
-      $config = LoadFile($file) // {};
+      $config = LoadFile( $file ) // {};
       ref $config eq 'HASH' or die $!;
       $config_loaded++;
     };
   }
 
-  $config_loaded
-    or $config = {}
-    and warn
-    "WARNING: Could not read configuration. Using defaults (and options).\n";
+  $config_loaded or $config = {}
+    and warn "WARNING: Could not read configuration. Using defaults (and options).\n";
 
-  return {%{$self->default_config}, %$config, %{$self->cli_opts},};
+  return {
+    %{ $self->default_config } ,
+    %$config ,
+    %{ $self->cli_opts } ,
+  };
 }
 
 
-has config_file => (is => 'ro', isa => 'Str',);
+has config_file => (
+  is      => 'ro' ,
+  isa     => 'Str' ,
+);
 
 
 has default_config => (
-  is       => 'ro',
-  isa      => 'HashRef',
-  traits   => ['Hash'],
-  init_arg => undef,
-  default  => sub {
-    {
-      destination => '_site',
-      include_dir => '_includes',
-      layout_dir  => '_layouts',
-      posts_dir   => '_posts',
-      plugin_dir  => '_plugins',
-      source      => '.',
-    };
-  },
+  is       => 'ro' ,
+  isa      => 'HashRef' ,
+  traits   => [ 'Hash' ] ,
+  init_arg => undef ,
+  default  => sub{{
+    destination => '_site'    ,
+    include_dir => '_includes',
+    layout_dir  => '_layouts' ,
+    posts_dir   => '_posts' ,
+    source      => '.' ,
+  }},
 );
 
 
 has destination => (
-  is      => 'ro',
-  isa     => 'HiD_DirPath',
-  lazy    => 1,
+  is      => 'ro' ,
+  isa     => 'HiD_DirPath' ,
+  lazy    => 1 ,
   default => sub {
-    my $dest = shift->get_config('destination');
+    my $dest = shift->get_config( 'destination' );
     make_path $dest unless -e -d $dest;
     return $dest;
   },
@@ -106,112 +113,79 @@ has destination => (
 
 
 has include_dir => (
-  is      => 'ro',
-  isa     => 'Maybe[HiD_DirPath]',
+  is      => 'ro' ,
+  isa     => 'Maybe[HiD_DirPath]' ,
   lazy    => 1,
   default => sub {
     my $self = shift;
-    my $dir  = $self->get_config('include_dir');
-    (-e -d '_includes') ? $dir : undef;
-  },
+    my $dir  = $self->get_config( 'include_dir' );
+    ( -e -d '_includes' ) ? $dir : undef;
+  } ,
 );
-
-
-has plugin_dir => (
-  is      => 'ro',
-  isa     => 'Maybe[HiD_DirPath]',
-  lazy    => 1,
-  default => sub {
-    my $dir = shift->get_config('plugin_dir');
-    (-e -d $dir) ? $dir : undef;
-  },
-);
-
-
-has plugins => (
-    is => 'ro',
-    isa => 'Maybe[ArrayRef[Str]]',
-    lazy => 1,
-    builder => '_build_plugins',
-);
-
-sub _build_plugins {
-    my $self = shift;
-
-    return undef unless $self->plugin_dir;
-    # TODO: LOAD PLUGIN
-
-    # default plugin modules in HiD
-    my @def_mods = findallmod "Plugin";
-
-    # plugin modules in plugin_dir
-    setmoduledirs $self->plugin_dir;
-    my @mods = map { s/^\.:://r } findallmod ".";
-
-    # load plugin modules
-    my @all_plugins;
-    push @INC , $self->plugin_dir;
-    foreach my $m (@mods,@def_mods) {
-        my ($lrlt, $lerr) = try_load_class($m);
-        warn " plugin $m cannot be loaded : $lerr \n" and next unless $lrlt;
-        $m->isa('HiD::Plugin') or warn " plugin $m is not valid plugin, must subclass of HiD::Plugin \n" and next;
-        push @all_plugins, $m;
-    }
-    return @all_plugins ? \@all_plugins : undef;
-}
 
 
 has inputs => (
-  is      => 'ro',
+  is      => 'ro' ,
   isa     => 'HashRef',
-  default => sub { {} },
+  default => sub {{}} ,
   traits  => ['Hash'],
-  handles => {add_input => 'set', seen_input => 'exists',},
+  handles => {
+    add_input  => 'set' ,
+    seen_input => 'exists' ,
+  },
 );
 
 
 has layout_dir => (
-  is      => 'ro',
-  isa     => 'HiD_DirPath',
-  lazy    => 1,
-  default => sub { shift->get_config('layout_dir') },
+  is      => 'ro' ,
+  isa     => 'HiD_DirPath' ,
+  lazy    => 1 ,
+  default => sub { shift->get_config( 'layout_dir' ) },
 );
 
 
 has layouts => (
-  is      => 'ro',
+  is      => 'ro' ,
   isa     => 'HashRef[HiD::Layout]',
-  lazy    => 1,
+  lazy    => 1 ,
   builder => '_build_layouts',
-  traits  => ['Hash'],
-  handles => {get_layout_by_name => 'get',},
+  traits  => ['Hash'] ,
+  handles => {
+    get_layout_by_name => 'get' ,
+  },
 );
 
 sub _build_layouts {
   my $self = shift;
 
-  my @layout_files = File::Find::Rule->file->in($self->layout_dir);
+  my @layout_files = File::Find::Rule->file
+    ->in( $self->layout_dir );
 
   my %layouts;
-  foreach my $layout_file (@layout_files) {
+  foreach my $layout_file ( @layout_files ) {
     my $dir = $self->layout_dir;
 
-    my ($layout_name, $extension) = $layout_file =~ m|^$dir/(.*)\.([^.]+)$|;
+    my( $layout_name , $extension ) = $layout_file
+      =~ m|^$dir/(.*)\.([^.]+)$|;
 
-    $layouts{$layout_name} = HiD::Layout->new(
-      {filename => $layout_file, processor => $self->processor,});
+    $layouts{$layout_name} = HiD::Layout->new({
+      filename  => $layout_file,
+      processor => $self->processor ,
+    });
 
-    $self->add_input($layout_file => 'layout');
+    $self->add_input( $layout_file => 'layout' );
   }
 
-  foreach my $layout_name (keys %layouts) {
+  foreach my $layout_name ( keys %layouts ) {
     my $metadata = $layouts{$layout_name}->metadata;
 
-    if (my $embedded_layout = $metadata->{layout}) {
+    if ( my $embedded_layout = $metadata->{layout} ) {
       die "FIXME embedded layout fail $embedded_layout"
         unless $layouts{$embedded_layout};
 
-      $layouts{$layout_name}->set_layout($layouts{$embedded_layout});
+      $layouts{$layout_name}->set_layout(
+        $layouts{$embedded_layout}
+      );
     }
   }
 
@@ -219,71 +193,36 @@ sub _build_layouts {
 }
 
 
-has limit_posts => (is => 'ro', isa => 'HiD_PosInt',);
+has limit_posts => (
+  is     => 'ro' ,
+  isa    => 'HiD_PosInt' ,
+);
 
 
 has objects => (
-  is      => 'ro',
-  isa     => 'ArrayRef[Object]',
-  traits  => ['Array'],
-  default => sub { [] },
-  handles => {add_object => 'push', all_objects => 'elements',},
+  is  => 'ro' ,
+  isa => 'ArrayRef[Object]' ,
+  traits => [ 'Array' ] ,
+  default => sub{[]} ,
+  handles => {
+    add_object  => 'push' ,
+    all_objects => 'elements' ,
+  },
 );
-
-
-has 'categories' => (
-  is      => 'ro',
-  isa     => 'Maybe[HashRef[ArrayRef[HiD::Post]]]',
-  lazy    => 1,
-  builder => '_build_categories',
-);
-
-sub _build_categories {
-  my $self = shift;
-
-  return undef unless $self->posts;
-
-  my $categories_hash = {};
-  foreach my $post (@{$self->posts}) {
-    push @{$categories_hash->{$_}}, $post for @{$post->categories};
-  }
-  return $categories_hash;
-}
-
-
-has 'tags' => (
-  is      => 'ro',
-  isa     => 'Maybe[HashRef[ArrayRef[HiD::Post]]]',
-  lazy    => 1,
-  builder => '_build_tags',
-);
-
-sub _build_tags {
-    my $self = shift;
-
-    return undef unless $self->posts;
-
-    my $tags_hash = {};
-    foreach my $post (@{$self->posts}) {
-        push @{$tags_hash->{$_}}, $post for @{$post->tags};
-    }
-    return $tags_hash;
-}
-
 
 
 has page_file_regex => (
-  is      => 'ro',
+  is      => 'ro' ,
   isa     => 'RegexpRef',
-  default => sub {qr/\.(mk|mkd|mkdn|markdown|textile|html)$/},
+  default => sub { qr/\.(mk|mkd|mkdn|markdown|textile|html)$/ } ,
 );
 
 
 has pages => (
   is      => 'ro',
   isa     => 'Maybe[ArrayRef[HiD::Page]]',
-  lazy    => 1,
-  builder => '_build_pages',
+  lazy    => 1 ,
+  builder => '_build_pages' ,
 );
 
 sub _build_pages {
@@ -292,27 +231,25 @@ sub _build_pages {
   # build posts before pages
   $self->posts;
 
-  my @potential_pages
-    = File::Find::Rule->file->name($self->page_file_regex)->in('.');
+  my @potential_pages = File::Find::Rule->file->
+    name( $self->page_file_regex )->in( '.' );
 
-  my @pages = grep {$_} map {
-    if ($self->seen_input($_) or $_ =~ /^_/) {0}
+  my @pages = grep { $_ } map {
+    if ($self->seen_input( $_ ) or $_ =~ /^_/ ) { 0 }
     else {
       try {
-        my $page = HiD::Page->new(
-          {
-            dest_dir       => $self->destination,
-            hid            => $self,
-            input_filename => $_,
-            layouts        => $self->layouts,
-          }
-        );
+        my $page = HiD::Page->new({
+          dest_dir       => $self->destination,
+          hid            => $self ,
+          input_filename => $_ ,
+          layouts        => $self->layouts ,
+        });
         $page->content;
-        $self->add_input($_ => 'page');
-        $self->add_object($page);
+        $self->add_input( $_ => 'page' );
+        $self->add_object( $page );
         $page;
       }
-      catch {0};
+      catch { 0 };
     }
   } @potential_pages;
 
@@ -321,27 +258,25 @@ sub _build_pages {
 
 
 has post_file_regex => (
-  is      => 'ro',
-  isa     => 'RegexpRef',
-  default => sub {
-    qr/^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}-(?:.+?)\.(?:mk|mkd|mkdn|markdown|md|text|textile|html)$/;
-  },
+  is      => 'ro' ,
+  isa     => 'RegexpRef' ,
+  default => sub { qr/^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}-(?:.+?)\.(?:mk|mkd|mkdn|markdown|md|text|textile|html)$/ },
 );
 
 
 has posts_dir => (
-  is      => 'ro',
-  isa     => 'HiD_DirPath',
-  lazy    => 1,
-  default => sub { shift->get_config('posts_dir') },
+  is      => 'ro' ,
+  isa     => 'HiD_DirPath' ,
+  lazy    => 1 ,
+  default => sub { shift->get_config( 'posts_dir' ) },
 );
 
 
 has posts => (
-  is      => 'ro',
-  isa     => 'Maybe[ArrayRef[HiD::Post]]',
-  lazy    => 1,
-  builder => '_build_posts',
+  is      => 'ro' ,
+  isa     => 'Maybe[ArrayRef[HiD::Post]]' ,
+  lazy    => 1 ,
+  builder => '_build_posts' ,
 );
 
 sub _build_posts {
@@ -353,35 +288,31 @@ sub _build_posts {
   my $rule = File::Find::Rule->new;
 
   my @posts_directories = $rule->or(
-    $rule->new->directory->name('_posts'),
-    $rule->new->directory->name('_site')->prune->discard,
-  )->in($self->source);
+    $rule->new->directory->name( '_posts' ) ,
+      $rule->new->directory->name( '_site' )->prune->discard ,
+  )->in( $self->source );
 
-  my @potential_posts = File::Find::Rule->file->name($self->post_file_regex)
-    ->in(@posts_directories);
+  my @potential_posts = File::Find::Rule->file
+    ->name( $self->post_file_regex )->in( @posts_directories );
 
-  my @posts = grep {$_} map {
+  my @posts = grep { $_ } map {
     try {
-      my $post = HiD::Post->new(
-        {
-          dest_dir       => $self->destination,
-          hid            => $self,
-          input_filename => $_,
-          layouts        => $self->layouts,
-        }
-      );
-      $self->add_input($_ => 'post');
-      $self->add_object($post);
-      $post;
-    }
-    catch {0};
+      my $post = HiD::Post->new({
+        dest_dir       => $self->destination,
+        input_filename => $_ ,
+        layouts        => $self->layouts ,
+      });
+      $self->add_input( $_ => 'post' );
+      $self->add_object( $post );
+      $post
+    } catch { 0 };
   } @potential_posts;
 
   @posts = sort { $b->date <=> $a->date } @posts;
 
-  if (my $limit = $self->limit_posts) {
+  if ( my $limit = $self->limit_posts ) {
     die "--limit_posts must be positive" if $limit < 1;
-    @posts = splice(@posts, -$limit, $limit);
+    @posts = splice( @posts , -$limit , $limit );
   }
 
   return \@posts;
@@ -389,40 +320,41 @@ sub _build_posts {
 
 
 has processor => (
-  is      => 'ro',
-  isa     => 'HiD::Processor',
-  lazy    => 1,
+  is      => 'ro' ,
+  isa     => 'HiD::Processor' ,
+  lazy    => 1 ,
   default => sub {
     my $self = shift;
 
-    my $processor_name = $self->get_config('processor_name') // 'Template';
+    my $processor_name  = $self->get_config( 'processor_name' ) // 'Template';
 
-    my $processor_class
-      = ($processor_name =~ /^\+/)
-      ? $processor_name
+    my $processor_class = ( $processor_name =~ /^\+/ ) ? $processor_name
       : "HiD::Processor::$processor_name";
 
-    try_load_class($processor_class);
+    try_load_class( $processor_class );
 
-    return $processor_class->new($self->processor_args);
+    return $processor_class->new( $self->processor_args );
   },
 );
 
 
 has processor_args => (
-  is      => 'ro',
-  isa     => 'ArrayRef|HashRef',
-  lazy    => 1,
+  is      => 'ro' ,
+  isa     => 'ArrayRef|HashRef' ,
+  lazy    => 1 ,
   default => sub {
     my $self = shift;
 
-    return $self->get_config('processor_args')
-      if defined $self->get_config('processor_args');
+    return $self->get_config( 'processor_args' ) if
+      defined $self->get_config( 'processor_args' );
 
     my $include_path = $self->layout_dir;
-    $include_path .= ':' . $self->include_dir if defined $self->include_dir;
+    $include_path   .= ':' . $self->include_dir
+      if defined $self->include_dir;
 
-    return {INCLUDE_PATH => $include_path,};
+    return {
+      INCLUDE_PATH => $include_path ,
+    };
   },
 );
 
@@ -430,8 +362,8 @@ has processor_args => (
 has regular_files => (
   is      => 'ro',
   isa     => 'Maybe[ArrayRef[HiD::File]]',
-  lazy    => 1,
-  builder => '_build_regular_files',
+  lazy    => 1 ,
+  builder => '_build_regular_files' ,
 );
 
 sub _build_regular_files {
@@ -440,15 +372,17 @@ sub _build_regular_files {
   # build pages before regular files
   $self->pages;
 
-  my @potential_files = File::Find::Rule->file->in('.');
+  my @potential_files = File::Find::Rule->file->in( '.' );
 
-  my @files = grep {$_} map {
-    if ($self->seen_input($_) or $_ =~ /^_/) {0}
+  my @files = grep { $_ } map {
+    if ($self->seen_input( $_ ) or $_ =~ /^_/ ) { 0 }
     else {
-      my $file = HiD::File->new(
-        {dest_dir => $self->destination, input_filename => $_,});
-      $self->add_input($_ => 'file');
-      $self->add_object($file);
+      my $file = HiD::File->new({
+        dest_dir       => $self->destination,
+        input_filename => $_ ,
+      });
+      $self->add_input( $_ => 'file' );
+      $self->add_object( $file );
       $file;
     }
   } @potential_files;
@@ -458,12 +392,12 @@ sub _build_regular_files {
 
 
 has source => (
-  is      => 'ro',
-  isa     => 'HiD_DirPath',
-  lazy    => 1,
+  is      => 'ro' ,
+  isa     => 'HiD_DirPath' ,
+  lazy    => 1 ,
   default => sub {
     my $self   = shift;
-    my $source = $self->get_config('source');
+    my $source = $self->get_config( 'source' );
     chdir $source or die $!;
     return $source;
   },
@@ -471,46 +405,40 @@ has source => (
 
 
 has written_files => (
-  is      => 'ro',
-  isa     => 'HashRef',
-  traits  => [qw/ Hash /],
-  default => sub { {} },
+  is      => 'ro' ,
+  isa     => 'HashRef' ,
+  traits  => [ qw/ Hash / ] ,
+  default => sub {{}},
   handles => {
-    add_written_file  => 'set',
-    all_written_files => 'keys',
-    wrote_file        => 'defined',
+    add_written_file  => 'set' ,
+    all_written_files => 'keys' ,
+    wrote_file        => 'defined' ,
   },
 );
 
 
 sub publish {
-  my ($self) = @_;
+  my( $self ) = @_;
 
-# bootstrap data structures -- FIXME should have a more explicit way to do this
+  # bootstrap data structures -- FIXME should have a more explicit way to do this
   $self->regular_files;
 
-  $self->add_written_file($self->destination => '_site_dir');
+  $self->add_written_file( $self->destination => '_site_dir' );
 
-  foreach my $file ($self->all_objects) {
+  foreach my $file ( $self->all_objects ) {
     $file->publish;
 
     my $path;
-    foreach my $part (split '/', $file->output_filename) {
-      $path = file($path, $part)->stringify;
-      $self->add_written_file($path => 1);
+    foreach my $part ( split '/' , $file->output_filename ) {
+      $path = file( $path , $part )->stringify;
+      $self->add_written_file( $path => 1 );
     }
   }
 
-  foreach (File::Find::Rule->in($self->destination)) {
-    $self->wrote_file($_) or remove \1, $_;
+  foreach ( File::Find::Rule->in( $self->destination )) {
+    $self->wrote_file($_) or remove \1 , $_;
   }
 
-  # execute PLUGINS
-  return 1 unless $self->plugins;
-
-  foreach my $p (@{$self->plugins}) {
-      $p->new->after_publish($self);
-  }
   1;
 
 }
@@ -565,7 +493,6 @@ Hashref of standard configuration options. The default config is:
     include_dir => '_includes',
     layout_dir  => '_layouts' ,
     posts_dir   => '_posts' ,
-    plugin_dir  => '_plugins',
     source      => '.' ,
 
 =head2 destination
@@ -577,14 +504,6 @@ B<N.B.:> If it doesn't exist and is needed, it will be created.
 =head2 include_dir
 
 Directory for template "include" files
-
-=head2 plugin_dir
-
-Directory for plugins, which will be called after publish.
-
-=head2 plugins
-
-Plugins, called after publish.
 
 =head2 inputs
 
@@ -608,14 +527,6 @@ Setting this can significantly speed up publishing for sites with many blog post
 =head2 objects
 
 Array of objects (pages, posts, files) created during site processing.
-
-=head2 categories
-
-Categories hash, contains (category, post) pairs
-
-=head2 tags
-
-Tags hash, contains (tag, posts) pairs
 
 =head2 page_file_regex
 
@@ -748,7 +659,7 @@ L<StaticVolt>
 
 =head1 VERSION
 
-version 0.9
+version 0.4
 
 =head1 AUTHOR
 

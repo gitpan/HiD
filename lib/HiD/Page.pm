@@ -3,7 +3,7 @@
 
 package HiD::Page;
 {
-  $HiD::Page::VERSION = '0.9';
+  $HiD::Page::VERSION = '0.4';
 }
 BEGIN {
   $HiD::Page::AUTHORITY = 'cpan:GENEHACK';
@@ -36,7 +36,7 @@ sub publish {
 
   make_path $dir unless -d $dir;
 
-  open( my $out , '>:utf8' , $self->output_filename ) or die $!;
+  open( my $out , '>' , $self->output_filename ) or die $!;
   print $out $self->rendered_content;
   close( $out );
 }
@@ -54,11 +54,10 @@ sub _build_url {
   my $naive = join '/' , $path_frag , $self->basename;
 
   my $url;
-  given( $format ) {
-    when( 'none'   ) { $url = $naive . '.html' }
-    when( 'pretty' ) { $url = $naive . '/'     }
-    default          { $url = "/$format"       }
-  }
+
+  if(    $format eq 'none'   ) { $url = $naive . '.html' }
+  elsif( $format eq 'pretty' ) { $url = $naive . '/'     }
+  else                         { $url = "/$format"       }
 
   $url =~ s|//+|/|g;
 
@@ -112,7 +111,7 @@ object from this class works.
 
 =head1 VERSION
 
-version 0.9
+version 0.4
 
 =head1 AUTHOR
 

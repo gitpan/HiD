@@ -3,7 +3,7 @@
 
 package HiD::Layout;
 {
-  $HiD::Layout::VERSION = '0.9';
+  $HiD::Layout::VERSION = '0.4';
 }
 BEGIN {
   $HiD::Layout::AUTHORITY = 'cpan:GENEHACK';
@@ -22,7 +22,6 @@ use feature     qw/ unicode_strings /;
 use File::Slurp qw/ read_file / ;
 use HiD::Types;
 use YAML::XS;
-use Encode;
 
 
 has content => (
@@ -86,14 +85,14 @@ sub BUILDARGS {
     ( $args{name} , $args{ext} ) = $args{filename}
       =~ m|^.*/(.+)\.([^.]+)$|;
 
-    my $content  = read_file( $args{filename}, binmode => ':utf8' );
+    my $content  = read_file( $args{filename} );
     my $metadata = {};
 
     if ( $content =~ /^---\n/s ) {
       my $meta;
       ( $meta , $content ) = ( $content )
         =~ m|^---\n(.*?)---\n(.*)$|s;
-      $metadata = Load( encode('utf8', $meta) ) if $meta;
+      $metadata = Load( $meta ) if $meta;
     }
 
     $args{metadata} = $metadata;
@@ -208,7 +207,7 @@ Will recurse into embedded layouts as needed.
 
 =head1 VERSION
 
-version 0.9
+version 0.4
 
 =head1 AUTHOR
 
