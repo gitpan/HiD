@@ -3,7 +3,7 @@
 
 package HiD::Role::IsPublished;
 {
-  $HiD::Role::IsPublished::VERSION = '0.4';
+  $HiD::Role::IsPublished::VERSION = '1.0';
 }
 BEGIN {
   $HiD::Role::IsPublished::AUTHORITY = 'cpan:GENEHACK';
@@ -37,6 +37,24 @@ sub _build_basename {
   my $self = shift;
   my $ext = '.' . $self->ext;
   return fileparse( $self->input_filename , $ext );
+}
+
+
+has baseurl => (
+  is      => 'ro',
+  isa     => 'Str',
+  lazy    => 1,
+  builder => '_build_baseurl',
+);
+
+sub _build_baseurl {
+  my $self = shift;
+
+  my $base_url = $self->config->{baseurl};
+  if( defined $base_url ) {
+    return $base_url;
+  }
+  return '/';
 }
 
 
@@ -142,6 +160,10 @@ provides attributes and methods that are needed during that process.
 Basename of the file for this object (that is, without any leading directory
 path and without any file extension).
 
+=head2 baseurl
+
+Base URL for use in Templates
+
 =head2 dest_dir ( ro / isa = HiD_DirPath / required )
 
 The path to the directory where the output_filename will be written.
@@ -172,7 +194,7 @@ The URL to the output path for the written file.
 
 =head1 VERSION
 
-version 0.4
+version 1.0
 
 =head1 AUTHOR
 

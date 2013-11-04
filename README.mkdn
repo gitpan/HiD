@@ -16,6 +16,10 @@ useful or interesting for people that are trying to modify or extend HiD.
 
 # ATTRIBUTES
 
+## categories
+
+Categories hash, contains (category, post) pairs
+
 ## cli\_opts
 
 Hashref of command line options to integrate into the config.
@@ -37,6 +41,7 @@ Hashref of standard configuration options. The default config is:
     destination => '_site'    ,
     include_dir => '_includes',
     layout_dir  => '_layouts' ,
+    plugin_dir  => '_plugins' ,
     posts_dir   => '_posts' ,
     source      => '.' ,
 
@@ -45,6 +50,12 @@ Hashref of standard configuration options. The default config is:
 Directory to write output files into.
 
 __N.B.:__ If it doesn't exist and is needed, it will be created.
+
+## excerpt\_separator
+
+String that distinguishes initial excerpt from "below the fold" content
+
+Defaults to "\\n\\n"
 
 ## include\_dir
 
@@ -83,6 +94,14 @@ Regular expression for identifying "page" files.
 
 Arrayref of [HiD::Page](http://search.cpan.org/perldoc?HiD::Page) objects, populated during processing.
 
+## plugin\_dir
+
+Directory for plugins, which will be called after publish.
+
+## plugins
+
+Plugins, called after publish.
+
 ## post\_file\_regex
 
 Regular expression for which files will be recognized as blog posts.
@@ -117,6 +136,10 @@ ArrayRef of [HiD::File](http://search.cpan.org/perldoc?HiD::File) objects, popul
 ## source
 
 Base directory that all other paths are calculated relative to.
+
+## tags
+
+Tags hash, contains (tag, posts) pairs
 
 ## written\_files
 
@@ -184,6 +207,11 @@ Check to see if a particular file has been written out.
 
 Process files and generate output per the active configuration.
 
+# CONTRIBUTORS
+
+- ChinaXing
+- reyjrar
+
 # SEE ALSO
 
 - [jekyll](http://jekyllrb.com/)
@@ -192,7 +220,7 @@ Process files and generate output per the active configuration.
 
 # VERSION
 
-version 0.4
+version 1.0
 
 # AUTHOR
 

@@ -6,8 +6,10 @@ build_requires:
   App::Cmd::Tester: 0
   Cwd: 0
   Exporter: 0
-  File::Find: 0
+  File::Spec: 0
   File::Temp: 0
+  IO::Handle: 0
+  IPC::Open3: 0
   Test::File: 0
   Test::File::Contents: 0
   Test::More: 0
@@ -18,7 +20,7 @@ build_requires:
 configure_requires:
   ExtUtils::MakeMaker: 6.30
 dynamic_config: 0
-generated_by: 'Dist::Zilla version 4.300035, CPAN::Meta::Converter version 2.120921'
+generated_by: 'Dist::Zilla version 5.005, CPAN::Meta::Converter version 2.132661'
 license: perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -30,6 +32,7 @@ requires:
   DDP: 0
   Date::Parse: 0
   DateTime: 0
+  Encode: 0
   File::Basename: 0
   File::Copy::Recursive: 0
   File::Find::Rule: 0
@@ -37,6 +40,7 @@ requires:
   File::Remove: 0
   File::Slurp: 0
   FindBin: 0
+  Module::Find: 0
   Moose: 0
   Moose::Role: 0
   Moose::Util::TypeConstraints: 0
@@ -66,7 +70,7 @@ resources:
   bugtracker: http://rt.cpan.org/Public/Dist/Display.html?Name=HiD
   homepage: http://search.cpan.org/dist/HiD/
   repository: git://github.com/genehack/HiD.git
-version: 0.4
+version: 1.0
 x_Dist_Zilla:
   perl:
     version: 5.018000
@@ -94,63 +98,63 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::GatherDir
       name: '@Filter/@Basic/GatherDir'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::PruneCruft
       name: '@Filter/@Basic/PruneCruft'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::ManifestSkip
       name: '@Filter/@Basic/ManifestSkip'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::MetaYAML
       name: '@Filter/@Basic/MetaYAML'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::License
       name: '@Filter/@Basic/License'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::Readme
       name: '@Filter/@Basic/Readme'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Filter/@Basic/ExtraTests'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::ExecDir
       name: '@Filter/@Basic/ExecDir'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::ShareDir
       name: '@Filter/@Basic/ShareDir'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::MakeMaker
       name: '@Filter/@Basic/MakeMaker'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::Manifest
       name: '@Filter/@Basic/Manifest'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::TestRelease
       name: '@Filter/@Basic/TestRelease'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::ConfirmRelease
       name: '@Filter/@Basic/ConfirmRelease'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::UploadToCPAN
       name: '@Filter/@Basic/UploadToCPAN'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::AutoPrereqs
       name: '@Filter/AutoPrereqs'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::CheckChangesHasContent
       name: '@Filter/CheckChangesHasContent'
@@ -166,11 +170,16 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::PkgVersion
       name: '@Filter/PkgVersion'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::PodWeaver
+      config:
+        Dist::Zilla::Plugin::PodWeaver:
+          finder:
+            - ':InstallModules'
+            - ':ExecFiles'
       name: '@Filter/PodWeaver'
-      version: 3.101641
+      version: 3.102000
     -
       class: Dist::Zilla::Plugin::Bugtracker
       name: '@Filter/Bugtracker'
@@ -182,11 +191,11 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::MetaConfig
       name: '@Filter/MetaConfig'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::MetaJSON
       name: '@Filter/MetaJSON'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::Repository
       name: '@Filter/Repository'
@@ -194,7 +203,7 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::InstallGuide
       name: '@Filter/InstallGuide'
-      version: 1.200000
+      version: 1.200001
     -
       class: Dist::Zilla::Plugin::ReadmeMarkdownFromPod
       name: '@Filter/ReadmeMarkdownFromPod'
@@ -206,31 +215,37 @@ x_Dist_Zilla:
     -
       class: Dist::Zilla::Plugin::NextRelease
       name: '@Filter/NextRelease'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::ExtraTests
       name: '@Filter/ExtraTests'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::PodCoverageTests
       name: '@Filter/PodCoverageTests'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::PodSyntaxTests
       name: '@Filter/PodSyntaxTests'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::EOLTests
       name: '@Filter/EOLTests'
       version: 0.02
     -
       class: Dist::Zilla::Plugin::Test::Compile
+      config:
+        Dist::Zilla::Plugin::Test::Compile:
+          module_finder:
+            - ':InstallModules'
+          script_finder:
+            - ':ExecFiles'
       name: '@Filter/Test::Compile'
-      version: 2.002
+      version: 2.033
     -
       class: Dist::Zilla::Plugin::Twitter
       name: '@Filter/Twitter'
-      version: 0.021
+      version: 0.022
     -
       class: Dist::Zilla::Plugin::Git::Commit
       name: '@Filter/Git::Commit'
@@ -254,34 +269,34 @@ x_Dist_Zilla:
           phase: runtime
           type: requires
       name: Prereqs
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':IncModules'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':TestFiles'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ExecFiles'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':ShareFiles'
-      version: 4.300035
+      version: 5.005
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':MainModule'
-      version: 4.300035
+      version: 5.005
   zilla:
     class: Dist::Zilla::Dist::Builder
     config:
       is_trial: 0
-    version: 4.300035
+    version: 5.005
 x_authority: cpan:GENEHACK

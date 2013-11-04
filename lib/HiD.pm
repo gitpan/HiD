@@ -3,7 +3,7 @@
 
 package HiD;
 {
-  $HiD::VERSION = '0.4';
+  $HiD::VERSION = '1.0';
 }
 BEGIN {
   $HiD::AUTHORITY = 'cpan:GENEHACK';
@@ -31,9 +31,31 @@ use HiD::Layout;
 use HiD::Page;
 use HiD::Post;
 use HiD::Types;
+use Module::Find;
 use Path::Class        qw/ file /;
 use Try::Tiny;
 use YAML::XS           qw/ LoadFile /;
+
+
+has categories => (
+  is      => 'ro' ,
+  isa     => 'Maybe[HashRef[ArrayRef[HiD::Post]]]' ,
+  lazy    => 1 ,
+  builder => '_build_categories' ,
+);
+
+sub _build_categories {
+  my $self = shift;
+
+  return undef unless $self->posts;
+
+  my $categories_hash = {};
+  foreach my $post ( @{$self->posts} ) {
+    push @{ $categories_hash->{$_} }, $post for @{ $post->categories };
+  }
+
+  return $categories_hash;
+}
 
 
 has cli_opts => (
@@ -47,7 +69,7 @@ has cli_opts => (
 has config => (
   is      => 'ro' ,
   isa     => 'HashRef' ,
-  traits  => [ 'Hash' ],
+  traits  => [ 'Hash' ] ,
   lazy    => 1 ,
   builder => '_build_config' ,
   handles => {
@@ -94,6 +116,7 @@ has default_config => (
     destination => '_site'    ,
     include_dir => '_includes',
     layout_dir  => '_layouts' ,
+    plugin_dir  => '_plugins' ,
     posts_dir   => '_posts' ,
     source      => '.' ,
   }},
@@ -112,15 +135,23 @@ has destination => (
 );
 
 
+has excerpt_separator => (
+  is  => 'ro' ,
+  isa => 'Str' ,
+  lazy => 1 ,
+  default => sub { shift->get_config( 'excerpt_separator' ) // "\n\n" }
+);
+
+
 has include_dir => (
   is      => 'ro' ,
   isa     => 'Maybe[HiD_DirPath]' ,
-  lazy    => 1,
+  lazy    => 1 ,
   default => sub {
     my $self = shift;
     my $dir  = $self->get_config( 'include_dir' );
     ( -e -d '_includes' ) ? $dir : undef;
-  } ,
+  },
 );
 
 
@@ -200,10 +231,10 @@ has limit_posts => (
 
 
 has objects => (
-  is  => 'ro' ,
-  isa => 'ArrayRef[Object]' ,
-  traits => [ 'Array' ] ,
-  default => sub{[]} ,
+  is      => 'ro' ,
+  isa     => 'ArrayRef[Object]' ,
+  traits  => [ 'Array' ] ,
+  default => sub {[]},
   handles => {
     add_object  => 'push' ,
     all_objects => 'elements' ,
@@ -214,7 +245,7 @@ has objects => (
 has page_file_regex => (
   is      => 'ro' ,
   isa     => 'RegexpRef',
-  default => sub { qr/\.(mk|mkd|mkdn|markdown|textile|html)$/ } ,
+  default => sub { qr/\.(mk|mkd|mkdn|markdown|textile|html|htm|xml|xhtml|xhtm|shtm|shtml|rss)$/ } ,
 );
 
 
@@ -254,6 +285,58 @@ sub _build_pages {
   } @potential_pages;
 
   return \@pages;
+}
+
+
+has plugin_dir => (
+  is      => 'ro',
+  isa     => 'Maybe[HiD_DirPath]',
+  lazy    => 1,
+  default => sub {
+    my $dir = shift->get_config('plugin_dir');
+    (-e -d $dir) ? $dir : undef;
+  },
+);
+
+
+has plugins => (
+  is      => 'ro' ,
+  isa     => 'Maybe[ArrayRef[HiD::Plugin]]' ,
+  lazy    => 1 ,
+  builder => '_build_plugins' ,
+);
+
+sub _build_plugins {
+  my $self = shift;
+
+  return undef unless $self->plugin_dir;
+
+  # default plugin modules in HiD
+  my @def_mods = findallmod "Plugin";
+
+  # plugin modules in plugin_dir
+  setmoduledirs $self->plugin_dir;
+  my @mods = map { s/^\.:://r } findallmod ".";
+
+  # load plugin modules
+  my @all_plugins;
+
+  push @INC , $self->plugin_dir;
+
+  foreach my $m ( @mods , @def_mods ) {
+    my( $lrlt , $lerr ) = try_load_class( $m );
+
+    warn "plugin $m cannot be loaded : $lerr \n" and next
+      unless $lrlt;
+
+    $m->isa('HiD::Plugin')
+      or warn "plugin $m is not a valid plugin. Plugins must inherit from HiD::Plugin\n"
+        and next;
+
+    push @all_plugins, $m;
+  }
+
+  return @all_plugins ? \@all_plugins : undef;
 }
 
 
@@ -299,13 +382,15 @@ sub _build_posts {
     try {
       my $post = HiD::Post->new({
         dest_dir       => $self->destination,
+        hid            => $self ,
         input_filename => $_ ,
         layouts        => $self->layouts ,
       });
       $self->add_input( $_ => 'post' );
       $self->add_object( $post );
-      $post
-    } catch { 0 };
+      $post;
+    }
+    catch { 0 };
   } @potential_posts;
 
   @posts = sort { $b->date <=> $a->date } @posts;
@@ -376,6 +461,8 @@ sub _build_regular_files {
 
   my @files = grep { $_ } map {
     if ($self->seen_input( $_ ) or $_ =~ /^_/ ) { 0 }
+    elsif( $_ =~ /^\.git/ ) { 0 }
+    elsif( $_ =~ /^\.svn/ or $_ =~ /\/\.svn\// ) { 0 }
     else {
       my $file = HiD::File->new({
         dest_dir       => $self->destination,
@@ -402,6 +489,26 @@ has source => (
     return $source;
   },
 );
+
+
+has 'tags' => (
+  is      => 'ro',
+  isa     => 'Maybe[HashRef[ArrayRef[HiD::Post]]]',
+  lazy    => 1,
+  builder => '_build_tags',
+);
+
+sub _build_tags {
+  my $self = shift;
+
+  return undef unless $self->posts;
+
+  my $tags_hash = {};
+  foreach my $post (@{$self->posts}) {
+    push @{$tags_hash->{$_}}, $post for @{$post->tags};
+  }
+  return $tags_hash;
+}
 
 
 has written_files => (
@@ -439,9 +546,16 @@ sub publish {
     $self->wrote_file($_) or remove \1 , $_;
   }
 
+  # execute PLUGINS
+  return 1 unless $self->plugins;
+
+  foreach my $p (@{$self->plugins}) {
+      $p->new->after_publish($self);
+  }
   1;
 
 }
+
 
 
 __PACKAGE__->meta->make_immutable;
@@ -471,6 +585,10 @@ useful or interesting for people that are trying to modify or extend HiD.
 
 =head1 ATTRIBUTES
 
+=head2 categories
+
+Categories hash, contains (category, post) pairs
+
 =head2 cli_opts
 
 Hashref of command line options to integrate into the config.
@@ -492,6 +610,7 @@ Hashref of standard configuration options. The default config is:
     destination => '_site'    ,
     include_dir => '_includes',
     layout_dir  => '_layouts' ,
+    plugin_dir  => '_plugins' ,
     posts_dir   => '_posts' ,
     source      => '.' ,
 
@@ -500,6 +619,12 @@ Hashref of standard configuration options. The default config is:
 Directory to write output files into.
 
 B<N.B.:> If it doesn't exist and is needed, it will be created.
+
+=head2 excerpt_separator
+
+String that distinguishes initial excerpt from "below the fold" content
+
+Defaults to "\n\n"
 
 =head2 include_dir
 
@@ -538,6 +663,14 @@ Regular expression for identifying "page" files.
 
 Arrayref of L<HiD::Page> objects, populated during processing.
 
+=head2 plugin_dir
+
+Directory for plugins, which will be called after publish.
+
+=head2 plugins
+
+Plugins, called after publish.
+
 =head2 post_file_regex
 
 Regular expression for which files will be recognized as blog posts.
@@ -572,6 +705,10 @@ ArrayRef of L<HiD::File> objects, populated during processing.
 =head2 source
 
 Base directory that all other paths are calculated relative to.
+
+=head2 tags
+
+Tags hash, contains (tag, posts) pairs
 
 =head2 written_files
 
@@ -639,6 +776,20 @@ Check to see if a particular file has been written out.
 
 Process files and generate output per the active configuration.
 
+=head1 CONTRIBUTORS
+
+=over 4
+
+=item *
+
+ChinaXing
+
+=item *
+
+reyjrar
+
+=back
+
 =head1 SEE ALSO
 
 =over 4
@@ -659,7 +810,7 @@ L<StaticVolt>
 
 =head1 VERSION
 
-version 0.4
+version 1.0
 
 =head1 AUTHOR
 

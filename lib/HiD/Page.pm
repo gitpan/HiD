@@ -3,7 +3,7 @@
 
 package HiD::Page;
 {
-  $HiD::Page::VERSION = '0.4';
+  $HiD::Page::VERSION = '1.0';
 }
 BEGIN {
   $HiD::Page::AUTHORITY = 'cpan:GENEHACK';
@@ -36,7 +36,7 @@ sub publish {
 
   make_path $dir unless -d $dir;
 
-  open( my $out , '>' , $self->output_filename ) or die $!;
+  open( my $out , '>:utf8' , $self->output_filename ) or die $!;
   print $out $self->rendered_content;
   close( $out );
 }
@@ -53,9 +53,12 @@ sub _build_url {
 
   my $naive = join '/' , $path_frag , $self->basename;
 
+  my %_valid_exts = map { $_=>1 } qw(rss xml html htm xhtml xhtm shtml shtm);
+  my $ext = exists $_valid_exts{$self->ext} ? $self->ext : 'html';
+
   my $url;
 
-  if(    $format eq 'none'   ) { $url = $naive . '.html' }
+  if(    $format eq 'none'   ) { $url = $naive . ".$ext" }
   elsif( $format eq 'pretty' ) { $url = $naive . '/'     }
   else                         { $url = "/$format"       }
 
@@ -111,7 +114,7 @@ object from this class works.
 
 =head1 VERSION
 
-version 0.4
+version 1.0
 
 =head1 AUTHOR
 

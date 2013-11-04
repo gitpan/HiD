@@ -3,7 +3,7 @@
 
 package HiD::Role::IsPost;
 {
-  $HiD::Role::IsPost::VERSION = '0.4';
+  $HiD::Role::IsPost::VERSION = '1.0';
 }
 BEGIN {
   $HiD::Role::IsPost::AUTHORITY = 'cpan:GENEHACK';
@@ -94,11 +94,50 @@ has date => (
 );
 
 
-### TODO parse tags out of metadata
+has excerpt => (
+  is      => 'ro',
+  isa     => 'Str',
+  lazy    => 1,
+  builder => '_build_excerpt',
+);
+
+sub _build_excerpt {
+  my $self = shift;
+
+  my $content = $self->content;
+
+  return unless defined $content;
+
+  my $sep = $self->hid->excerpt_separator;
+
+  if($content =~ /^$sep/mp) {
+    return ${^PREMATCH};
+  }
+
+  return $content;
+}
+
+
 has tags => (
   is      => 'ro' ,
   isa     => 'ArrayRef',
-  default => sub {[]} ,
+  default => sub {
+    my $self = shift;
+
+    if ( my $tag = $self->get_metadata( 'tag' )) {
+      return [ $tag ];
+    }
+    elsif ( my $tags = $self->get_metadata( 'tags' )) {
+      if ( ref $tags ) {
+        return [ @$tags ];
+      }
+      else {
+        my @tags = split /\s/ , $tags;
+        return [ @tags ];
+      }
+    }
+    else { return [] }
+  } ,
 );
 
 
@@ -174,13 +213,19 @@ post-specific attributes and methods.
 
 DateTime object for this post.
 
+=head2 excerpt
+
+It is generally useful to summarize or lead a post with a "read more" tag
+added to the end of the post.  This is ideal for a blog where we might not
+want to list the full post on the front page.
+
 =head2 tags
 
 =head2 title
 
 =head1 VERSION
 
-version 0.4
+version 1.0
 
 =head1 AUTHOR
 

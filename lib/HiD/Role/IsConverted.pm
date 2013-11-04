@@ -3,7 +3,7 @@
 
 package HiD::Role::IsConverted;
 {
-  $HiD::Role::IsConverted::VERSION = '0.4';
+  $HiD::Role::IsConverted::VERSION = '1.0';
 }
 BEGIN {
   $HiD::Role::IsConverted::AUTHORITY = 'cpan:GENEHACK';
@@ -21,6 +21,8 @@ use feature     qw/ unicode_strings /;
 
 use Carp;
 use Class::Load  qw/ :all /;
+use Encode;
+use File::Slurp  qw/ read_file /;
 use HiD::Types;
 use YAML::XS     qw/ Load /;
 
@@ -34,36 +36,43 @@ has content => (
 );
 
 
-### FIXME make this extensible
-my %conversion_extension_map = (
-  markdown => [ 'Text::Markdown' , 'markdown' ] ,
-  mkdn     => [ 'Text::Markdown' , 'markdown' ] ,
-  mk       => [ 'Text::Markdown' , 'markdown' ] ,
-  textile  => [ 'Text::Textile'  , 'process'  ] ,
-);
-
 has converted_content => (
   is      => 'ro' ,
   isa     => 'Str' ,
   lazy    => 1 ,
   default => sub {
     my $self = shift;
+    return _convert_by_extension( $self->content , $self->ext );
+  }
+);
 
-    return $self->content
-      unless exists $conversion_extension_map{ $self->ext };
 
-    my( $module , $method ) =
-      @{ $conversion_extension_map{ $self->ext }};
-    load_class( $module );
+has converted_excerpt => (
+  is      => 'ro' ,
+  isa     => 'Str' ,
+  lazy    => 1 ,
+  default => sub {
+    my $self = shift;
 
-    return $module->new->$method( $self->content );
+    my $converted_excerpt = _convert_by_extension( $self->excerpt , $self->ext );
+
+    if ( $self->excerpt ne $self->content ) {
+      # Add the "read more" link
+      ### FIXME this should be configurable
+      $converted_excerpt .= q{<p class="readmore"><a href="}
+        . $self->url
+          . q{" class="readmore">read more</a></p>};
+    }
+
+    return $converted_excerpt;
   },
 );
 
 
 has hid => (
-  is  => 'ro' ,
-  isa => 'HiD' ,
+  is       => 'ro' ,
+  isa      => 'HiD' ,
+  required => 1 ,
 );
 
 
@@ -119,7 +128,7 @@ has template_data => (
       site     => $self->hid ,
     };
 
-    foreach my $method ( qw/ title url / ) {
+    foreach my $method ( qw/ categories date tags title url / ) {
       $data->{page}{$method} = $self->$method
         if $self->can( $method );
     }
@@ -135,15 +144,7 @@ around BUILDARGS => sub {
   my %args = ( ref $_[0] and ref $_[0] eq 'HASH' ) ? %{ $_[0] } : @_;
 
   unless ( $args{content} and $args{metadata} ) {
-    open( my $IN , '<' , $args{input_filename} )
-      or confess "$! $args{input_filename}";
-
-    my $file_content;
-    {
-      local $/;
-      $file_content .= <$IN>;
-    }
-    close( $IN );
+    my $file_content = read_file( $args{input_filename}, binmode => ':utf8' );
 
     my( $metadata , $content );
     if ( $file_content =~ /^---/ ) {
@@ -159,11 +160,36 @@ around BUILDARGS => sub {
     }
 
     $args{content}  = $content;
-    $args{metadata} = Load( $metadata ) // {};
+    $args{metadata} = Load( encode('utf8',$metadata) ) // {};
   }
 
   return $class->$orig( \%args );
 };
+
+{ # hide the map
+
+  ### FIXME make this extensible
+  my %conversion_extension_map = (
+    markdown => [ 'Text::Markdown' , 'markdown' ] ,
+    mkdn     => [ 'Text::Markdown' , 'markdown' ] ,
+    mk       => [ 'Text::Markdown' , 'markdown' ] ,
+    md       => [ 'Text::Markdown' , 'markdown' ] ,
+    textile  => [ 'Text::Textile'  , 'process'  ] ,
+  );
+
+  sub _convert_by_extension {
+    my( $content , $extension ) = @_;
+
+    return $content
+      unless exists $conversion_extension_map{ $extension };
+
+    my( $module , $method ) = @{ $conversion_extension_map{ $extension }};
+    load_class( $module );
+
+    my $converted = $module->new->$method( $content );
+    return $converted;
+  }
+}
 
 no Moose::Role;
 1;
@@ -205,6 +231,10 @@ Page content (stuff after the YAML front matter)
 
 Content after it has gone through the conversion process.
 
+=head2 converted_excerpt ( ro / Str / lazily built from content )
+
+Excerpt after it has gone through the conversion process
+
 =head2 hid
 
 The HiD object for the current site. Here primarily to provide access to site
@@ -228,7 +258,7 @@ Data for passing to template processing function.
 
 =head1 VERSION
 
-version 0.4
+version 1.0
 
 =head1 AUTHOR
 

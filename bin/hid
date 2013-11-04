@@ -1,10 +1,10 @@
-#! /opt/perl/bin/perl
+#! /usr/bin/env perl
 # PODNAME: hid
 # ABSTRACT: cool site, bro.
 
 use strict;
 use warnings;
-use 5.010;
+use 5.014;
 
 use FindBin;
 use lib "$FindBin::RealBin/../lib";
@@ -23,7 +23,7 @@ hid - cool site, bro.
 
 =head1 VERSION
 
-version 0.4
+version 1.0
 
 =head1 AUTHOR
 

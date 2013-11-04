@@ -1,5 +1,19 @@
 Revision history for HiD
 
+1.0       2013-11-04 14:44:27 America/Los_Angeles
+
+        Whole mess of stuff (excerpt support, general tweaks) (reyjrar)
+
+        Add auto_refresh attribute to 'server' command (ChinaXing)
+
+        Various UTF-8 fixes (ChinaXing)
+
+        Add tag support (ChinaXing)
+
+        Add plugin support (ChinaXing)
+
+        Add category support (ChinaXing)
+
 0.4       2013-07-04 21:57:29 America/Los_Angeles
 
         Ditch given/when code.

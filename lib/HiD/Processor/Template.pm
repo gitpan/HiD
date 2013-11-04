@@ -3,7 +3,7 @@
 
 package HiD::Processor::Template;
 {
-  $HiD::Processor::Template::VERSION = '0.4';
+  $HiD::Processor::Template::VERSION = '1.0';
 }
 BEGIN {
   $HiD::Processor::Template::AUTHORITY = 'cpan:GENEHACK';
@@ -63,7 +63,7 @@ Wraps up a L<Template> object and allows it to be used during HiD publication.
 
 =head1 VERSION
 
-version 0.4
+version 1.0
 
 =head1 AUTHOR
 

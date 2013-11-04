@@ -3,7 +3,7 @@
 
 package HiD::Post;
 {
-  $HiD::Post::VERSION = '0.4';
+  $HiD::Post::VERSION = '1.0';
 }
 BEGIN {
   $HiD::Post::AUTHORITY = 'cpan:GENEHACK';
@@ -50,7 +50,7 @@ sub publish {
 
   make_path $dir unless -d $dir;
 
-  open( my $out , '>' , $self->output_filename ) or die $!;
+  open( my $out , '>:utf8' , $self->output_filename ) or die $!;
   print $out $self->rendered_content;
   close( $out );
 }
@@ -60,6 +60,7 @@ sub _build_url {
   my $self = shift;
 
   my %formats = (
+    simple => '/posts/%{year}/%{month}/%{title}.html',
     date   => '/%{categories}s/%{year}s/%{month}s/%{day}s/%{title}s.html' ,
     pretty => '/%{categories}s/%{year}s/%{month}s/%{day}s/%{title}s/' ,
     none   => '/%{categories}s/%{title}s.html' ,
@@ -107,7 +108,8 @@ HiD::Post - Blog posts
 =head1 SYNOPSIS
 
     my $post = HiD::Post->new({
-      dest_dir       => 'path/to/output/dir'
+      dest_dir       => 'path/to/output/dir' ,
+      hid            => $master_hid_object ,
       input_filename => 'path/to/file/for/this/post' ,
       layouts        => $hashref_of_hid_layout_objects,
     });
@@ -131,7 +133,7 @@ disk -- this data from this object.
 
 =head1 VERSION
 
-version 0.4
+version 1.0
 
 =head1 AUTHOR
 
