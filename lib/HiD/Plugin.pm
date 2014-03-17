@@ -2,9 +2,7 @@
 
 
 package HiD::Plugin;
-{
-  $HiD::Plugin::VERSION = '1.0';
-}
+$HiD::Plugin::VERSION = '1.1';
 BEGIN {
   $HiD::Plugin::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -18,6 +16,7 @@ use autodie;
 use warnings   qw/ FATAL utf8 /;
 use charnames  qw/ :full           /;
 use feature    qw/ unicode_strings /;
+
 
 sub after_publish { 1 }
 
@@ -42,9 +41,13 @@ HiD::Plugin - Base class for plugins
 
 Base class for plugin object
 
+=head1 METHODS
+
+=head2 after_publish
+
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 AUTHOR
 

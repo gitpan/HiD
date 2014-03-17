@@ -2,9 +2,7 @@
 
 
 package HiD::App::Command::init;
-{
-  $HiD::App::Command::init::VERSION = '1.0';
-}
+$HiD::App::Command::init::VERSION = '1.1';
 BEGIN {
   $HiD::App::Command::init::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -55,7 +53,9 @@ sub _run {
 
   die "TODO: github support" if $self->github;
 
-  mkdir "_$_" for qw/ includes layouts site /;
+  for ( qw/ includes layouts site / ) {
+    mkdir "_$_" unless -e "_$_"
+  }
 
   open( my $fh , '>' , '_layouts/default.html' );
   print $fh <<EOF;
@@ -152,7 +152,7 @@ sub commands.
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 AUTHOR
 

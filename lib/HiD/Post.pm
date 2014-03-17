@@ -2,17 +2,19 @@
 
 
 package HiD::Post;
-{
-  $HiD::Post::VERSION = '1.0';
-}
+$HiD::Post::VERSION = '1.1';
 BEGIN {
   $HiD::Post::AUTHORITY = 'cpan:GENEHACK';
 }
 
 use Moose;
-with 'HiD::Role::IsConverted';
-with 'HiD::Role::IsPost';
-with 'HiD::Role::IsPublished';
+with
+  'HiD::Role::IsConverted',
+  'HiD::Role::IsPost',
+  'HiD::Role::IsPublished';
+with 'HiD::Role::DoesLogging'; # this one last b/c it needs method delegated
+                               # by initial roles
+
 use namespace::autoclean;
 
 use 5.014;
@@ -33,8 +35,9 @@ sub BUILD {
 
   if ( defined $self->get_metadata('published')
          and not $self->get_metadata('published')) {
-    warn sprintf "WARNING: Skipping %s because 'published' flag is false\n" ,
-      $self->input_filename;
+    $self->LOGWARN(
+      sprintf "Skipping %s because 'published' flag is false" , $self->input_filename
+    );
     die;
   }
 }
@@ -56,18 +59,38 @@ sub publish {
 }
 
 # override
+my $date_regex = qr|([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})|;
+
+sub _build_basename {
+  my $self = shift;
+  my $ext = '.' . $self->ext;
+  my $basename = fileparse( $self->input_filename , $ext );
+
+  if( $self->get_config( 'publish_drafts' )) {
+    if ( $self->is_draft ) {
+      # not fatal to lack a date if you're a draft, but okay to have one
+      $basename =~ s/^.*?$date_regex-//;
+      return $basename;
+    }
+  }
+
+  $basename =~ s/^.*?$date_regex-// or die "no date in filename";
+  return $basename;
+}
+
 sub _build_url {
   my $self = shift;
 
   my %formats = (
     simple => '/posts/%{year}/%{month}/%{title}.html',
     date   => '/%{categories}s/%{year}s/%{month}s/%{day}s/%{title}s.html' ,
+    ii     => '%{year}s/%{month}s/%{day}s/%{title}s.html' ,
     pretty => '/%{categories}s/%{year}s/%{month}s/%{day}s/%{title}s/' ,
     none   => '/%{categories}s/%{title}s.html' ,
   );
 
-  ### FIXME need a way to get overall config in here...
-  my $permalink_format = $self->get_metadata( 'permalink' ) // 'date';
+  my $permalink_format = $self->get_metadata( 'permalink' ) //
+   $self->get_config('permalink') // 'date';
 
   $permalink_format = $formats{$permalink_format}
     if exists $formats{$permalink_format};
@@ -86,7 +109,6 @@ sub _build_url {
     year       => $self->year ,
   };
 
-  $permalink = "/$permalink";
   $permalink =~ s|//+|/|g;
 
   return $permalink;
@@ -133,7 +155,7 @@ disk -- this data from this object.
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 AUTHOR
 

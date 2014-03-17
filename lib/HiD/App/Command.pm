@@ -2,9 +2,7 @@
 
 
 package HiD::App::Command;
-{
-  $HiD::App::Command::VERSION = '1.0';
-}
+$HiD::App::Command::VERSION = '1.1';
 BEGIN {
   $HiD::App::Command::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -55,10 +53,15 @@ sub execute {
     exit;
   }
 
-  $self->_set_hid( HiD->new({
-    cli_opts    => $opts ,
-    config_file => $self->config_file ,
-  }));
+  my $hid_config = { cli_opts => $opts };
+  if ( $self->isa( 'HiD::App::Command::init')) {
+    $hid_config->{config} = {},
+  }
+  else {
+    $hid_config->{config_file} = $self->config_file
+  }
+
+  $self->_set_hid( HiD->new($hid_config) );
 
   $self->_run( $opts , $args );
 }
@@ -106,7 +109,7 @@ Defaults to './_config.yml'
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 AUTHOR
 

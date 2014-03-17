@@ -2,9 +2,7 @@
 
 
 package HiD::App;
-{
-  $HiD::App::VERSION = '1.0';
-}
+$HiD::App::VERSION = '1.1';
 BEGIN {
   $HiD::App::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -41,7 +39,7 @@ See C<perldoc hid> for usage information.
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 AUTHOR
 

@@ -2,9 +2,7 @@
 
 
 package HiD::Role::IsPost;
-{
-  $HiD::Role::IsPost::VERSION = '1.0';
-}
+$HiD::Role::IsPost::VERSION = '1.1';
 BEGIN {
   $HiD::Role::IsPost::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -25,15 +23,24 @@ use File::Basename qw/ fileparse /;
 use HiD::Types;
 use YAML::XS;
 
-my $date_regex = qr|([0-9]{4})-([0-9]{1,2})-([0-9]{1,2})|;
 
-# override
-sub _build_basename {
+has author => (
+  is      => 'ro' ,
+  isa     => 'Str' ,
+  lazy    => 1 ,
+  builder => '_build_author' ,
+);
+
+sub _build_author {
   my $self = shift;
-  my $ext = '.' . $self->ext;
-  my $basename = fileparse( $self->input_filename , $ext );
-  $basename =~ s/^.*?$date_regex-// or die;
-  return $basename;
+
+  my $author = $self->get_metadata( 'author' );
+
+  return $author if defined $author;
+
+  return 'DRAFT AUTHOR -- FIX' if $self->is_draft;
+
+  die "Need author for " . $self->basename . "\n"
 }
 
 
@@ -73,6 +80,10 @@ has date => (
   },
   default => sub {
     my $self = shift;
+
+    if ( $self->get_config( 'publish_drafts' )){
+      return DateTime->now if $self->is_draft;
+    }
 
     my( $year , $month , $day );
     if ( my $date = $self->get_metadata( 'date' )) {
@@ -158,6 +169,22 @@ sub _build_title {
   return ( ref $title ) ? $$title : $title;
 }
 
+
+has twitter => (
+  is => 'ro' ,
+  isa => 'Maybe[Str]' ,
+  lazy => 1 ,
+  builder => '_build_twitter' ,
+);
+
+sub _build_twitter {
+  my $self = shift;
+
+  my $twitter = $self->get_metadata( 'twitter' );
+
+  return defined $twitter ? $twitter : undef;
+}
+
 around BUILDARGS => sub {
   my $orig  = shift;
   my $class = shift;
@@ -176,6 +203,16 @@ around BUILDARGS => sub {
 
   return $class->$orig( \%args );
 };
+
+
+my $drafts_dir;
+sub is_draft {
+  my $self = shift;
+
+  $drafts_dir //= $self->get_config( 'drafts_dir' );
+  return ( $self->input_filename =~ /^$drafts_dir/ ) ? 1 : 0;
+}
+
 
 no Moose::Role;
 1;
@@ -207,6 +244,8 @@ post-specific attributes and methods.
 
 =head1 ATTRIBUTES
 
+=head2 author
+
 =head2 categories
 
 =head2 date
@@ -223,9 +262,18 @@ want to list the full post on the front page.
 
 =head2 title
 
+=head2 twitter
+
+=head1 METHODS
+
+=head2 is_draft
+
+Returns a boolean value indicating whether this post is coming from the drafts
+folder or not.
+
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 AUTHOR
 

@@ -2,14 +2,13 @@
 
 
 package HiD::App::Command::server;
-{
-  $HiD::App::Command::server::VERSION = '1.0';
-}
+$HiD::App::Command::server::VERSION = '1.1';
 BEGIN {
   $HiD::App::Command::server::AUTHORITY = 'cpan:GENEHACK';
 }
 use Moose;
 extends 'HiD::App::Command';
+with 'HiD::Role::PublishesDrafts';
 use namespace::autoclean;
 
 use 5.014;
@@ -57,6 +56,11 @@ sub _build_port {
 
 sub _run {
   my( $self , $opts , $args ) = @_;
+
+  my $config = {};
+  if ( $self->publish_drafts ){
+    $config->{publish_drafts} = 1;
+  }
 
   $self->publish;
 
@@ -151,7 +155,7 @@ sub commands.
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 AUTHOR
 

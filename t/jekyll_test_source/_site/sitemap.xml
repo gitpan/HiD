@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en-us">
 <head>
    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-   <title>{{ page.title }}</title>
+   <title></title>
    <meta name="author" content="<%= @page.author %>" />
 
    <!-- CodeRay syntax highlighting CSS -->
@@ -19,22 +19,22 @@
   <div class="title">
     Tom Preston-Werner
   </div>
-  
+
   <?xml version="1.0" encoding="UTF-8"?>
 <urlset
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9 http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd" xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
 
   <url>
     <loc>http://example.com</loc>
-    <lastmod>{{ site.time | date: "%Y-%m-%d" }}</lastmod>
+    <lastmod>2014-03-17T17:31:38</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
 
   {% for post in site.posts %}
   <url>
-    <loc>http://example.com{{ post.url }}/</loc>
-    <lastmod>{{ post.date | date: "%Y-%m-%d" }}</lastmod>
+    <loc>http://example.com/</loc>
+    <lastmod></lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.2</priority>
   </url>
@@ -42,10 +42,10 @@
 
   {% for page in site.html_pages %}
   <url>
-    <loc>http://example.com{{ page.url }}</loc>
-    <lastmod>{{ site.time | date: "%Y-%m-%d" }}</lastmod>
-    {% if page.changefreq %}<changefreq>{{ page.changefreq }}</changefreq>{% endif %}
-    {% if page.priority %}<priority>{{ page.priority }}</priority>{% endif %}
+    <loc>http://example.com./sitemap.xml</loc>
+    <lastmod>2014-03-17T17:31:38</lastmod>
+    {% if page.changefreq %}<changefreq></changefreq>{% endif %}
+    {% if page.priority %}<priority></priority>{% endif %}
   </url>
   {% endfor %}
 </urlset>

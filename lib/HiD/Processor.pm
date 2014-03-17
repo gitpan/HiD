@@ -2,9 +2,7 @@
 
 
 package HiD::Processor;
-{
-  $HiD::Processor::VERSION = '1.0';
-}
+$HiD::Processor::VERSION = '1.1';
 BEGIN {
   $HiD::Processor::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -23,6 +21,9 @@ use feature     qw/ unicode_strings /;
 ### FIXME figure out whether this makes more sense as a role that would make
 ###       it easier to see as something implementing a particular interface,
 ###       for example.
+
+
+sub process { die "override this" }
 
 
 __PACKAGE__->meta->make_immutable;
@@ -49,9 +50,13 @@ Base class for HiD Processor objects.
 To create a new HiD Processor type, extend this class with something that
 implements a 'process' method.
 
+=head1 METHODS
+
+=head2 process
+
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 AUTHOR
 

@@ -1,9 +1,10 @@
+use 5.006;
 use strict;
 use warnings;
 
-# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.033
+# this test was generated with Dist::Zilla::Plugin::Test::Compile 2.039
 
-use Test::More  tests => 19 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
+use Test::More  tests => 28 + ($ENV{AUTHOR_TESTING} ? 1 : 0);
 
 
 
@@ -16,16 +17,25 @@ my @module_files = (
     'HiD/App/Command/publish.pm',
     'HiD/App/Command/server.pm',
     'HiD/File.pm',
+    'HiD/Generator.pm',
+    'HiD/Generator/AtomFeed.pm',
+    'HiD/Generator/TagPages.pm',
     'HiD/Layout.pm',
     'HiD/Page.pm',
+    'HiD/Pager.pm',
     'HiD/Plugin.pm',
     'HiD/Post.pm',
     'HiD/Processor.pm',
+    'HiD/Processor/Handlebars.pm',
+    'HiD/Processor/IIBlog.pm',
     'HiD/Processor/Template.pm',
+    'HiD/Role/DoesLogging.pm',
     'HiD/Role/IsConverted.pm',
     'HiD/Role/IsPost.pm',
     'HiD/Role/IsPublished.pm',
-    'HiD/Types.pm'
+    'HiD/Role/PublishesDrafts.pm',
+    'HiD/Types.pm',
+    'HiD/VirtualPage.pm'
 );
 
 my @scripts = (
@@ -34,22 +44,25 @@ my @scripts = (
 
 # no fake home requested
 
+my $inc_switch = -d 'blib' ? '-Mblib' : '-Ilib';
+
 use File::Spec;
 use IPC::Open3;
 use IO::Handle;
+
+open my $stdin, '<', File::Spec->devnull or die "can't open devnull: $!";
 
 my @warnings;
 for my $lib (@module_files)
 {
     # see L<perlfaq8/How can I capture STDERR from an external command?>
-    open my $stdin, '<', File::Spec->devnull or die "can't open devnull: $!";
     my $stderr = IO::Handle->new;
 
-    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, '-Mblib', '-e', "require q[$lib]");
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, $inc_switch, '-e', "require q[$lib]");
     binmode $stderr, ':crlf' if $^O eq 'MSWin32';
     my @_warnings = <$stderr>;
     waitpid($pid, 0);
-    is($? >> 8, 0, "$lib loaded ok");
+    is($?, 0, "$lib loaded ok");
 
     if (@_warnings)
     {
@@ -66,34 +79,22 @@ foreach my $file (@scripts)
 
     my @flags = $1 ? split(/\s+/, $1) : ();
 
-    open my $stdin, '<', File::Spec->devnull or die "can't open devnull: $!";
     my $stderr = IO::Handle->new;
 
-    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, '-Mblib', @flags, '-c', $file);
+    my $pid = open3($stdin, '>&STDERR', $stderr, $^X, $inc_switch, @flags, '-c', $file);
     binmode $stderr, ':crlf' if $^O eq 'MSWin32';
     my @_warnings = <$stderr>;
     waitpid($pid, 0);
-    is($? >> 8, 0, "$file compiled ok");
+    is($?, 0, "$file compiled ok");
 
    # in older perls, -c output is simply the file portion of the path being tested
     if (@_warnings = grep { !/\bsyntax OK$/ }
         grep { chomp; $_ ne (File::Spec->splitpath($file))[2] } @_warnings)
     {
-        # temporary measure - win32 newline issues?
-        warn map { _show_whitespace($_) } @_warnings;
+        warn @_warnings;
         push @warnings, @_warnings;
     }
 } }
-
-sub _show_whitespace
-{
-    my $string = shift;
-    $string =~ s/\012/[\\012]/g;
-    $string =~ s/\015/[\\015]/g;
-    $string =~ s/\t/[\\t]/g;
-    $string =~ s/ /[\\s]/g;
-    return $string;
-}
 
 
 

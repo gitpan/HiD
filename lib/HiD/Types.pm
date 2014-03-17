@@ -2,9 +2,7 @@
 
 
 package HiD::Types;
-{
-  $HiD::Types::VERSION = '1.0';
-}
+$HiD::Types::VERSION = '1.1';
 BEGIN {
   $HiD::Types::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -40,6 +38,20 @@ subtype 'HiD_PosInt'
   => where { $_ > 0 }
   => message { "Must be positive integer." };
 
+class_type 'HiD_Post' , { class => 'HiD::Post' };
+
+### FIXME delete if after 13 Nov 2014
+class_type 'deprecated_HiD_Plugin_class' , { class => 'HiD::Plugin'};
+
+role_type 'HiD_Plugin'    , { role => 'HiD::Plugin'};
+role_type 'HiD_Generator' , { role => 'HiD::Generator'};
+
+union 'Pluginish' , [qw/
+                         deprecated_HiD_Plugin_class
+                         HiD_Plugin
+                         HiD_Generator
+                       / ];
+
 no Moose::Util::TypeConstraints;
 1;
 
@@ -59,7 +71,7 @@ Type constraints for HiD.
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 AUTHOR
 

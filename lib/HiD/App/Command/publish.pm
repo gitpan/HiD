@@ -2,14 +2,13 @@
 
 
 package HiD::App::Command::publish;
-{
-  $HiD::App::Command::publish::VERSION = '1.0';
-}
+$HiD::App::Command::publish::VERSION = '1.1';
 BEGIN {
   $HiD::App::Command::publish::AUTHORITY = 'cpan:GENEHACK';
 }
 use Moose;
 extends 'HiD::App::Command';
+with 'HiD::Role::PublishesDrafts';
 use namespace::autoclean;
 
 use 5.014;
@@ -34,6 +33,10 @@ sub _run {
   my $config = {};
   if ( $self->limit_posts ) {
     $config->{limit_posts} = $self->limit_posts;
+  }
+
+  if ( $self->publish_drafts ){
+    $config->{publish_drafts} = 1;
   }
 
   $self->publish;
@@ -78,7 +81,7 @@ sub commands.
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 AUTHOR
 

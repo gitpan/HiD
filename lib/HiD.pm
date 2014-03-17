@@ -2,14 +2,13 @@
 
 
 package HiD;
-{
-  $HiD::VERSION = '1.0';
-}
+$HiD::VERSION = '1.1';
 BEGIN {
   $HiD::AUTHORITY = 'cpan:GENEHACK';
 }
 use Moose;
 use namespace::autoclean;
+# note: we also do 'with HiD::Role::DoesLogging', just later on because reasons.
 
 use 5.014;
 use utf8;
@@ -22,6 +21,7 @@ use charnames   qw/ :full           /;
 use feature     qw/ unicode_strings /;
 
 use Class::Load        qw/ :all /;
+use DateTime;
 use File::Basename;
 use File::Find::Rule;
 use File::Path         qw/ make_path /;
@@ -29,6 +29,7 @@ use File::Remove       qw/ remove /;
 use HiD::File;
 use HiD::Layout;
 use HiD::Page;
+use HiD::Pager;
 use HiD::Post;
 use HiD::Types;
 use Module::Find;
@@ -72,9 +73,7 @@ has config => (
   traits  => [ 'Hash' ] ,
   lazy    => 1 ,
   builder => '_build_config' ,
-  handles => {
-    get_config => 'get' ,
-  }
+  handles => { get_config => 'get' } ,
 );
 
 sub _build_config {
@@ -91,7 +90,7 @@ sub _build_config {
   }
 
   $config_loaded or $config = {}
-    and warn "WARNING: Could not read configuration. Using defaults (and options).\n";
+    and warn( 'Could not read configuration. Using defaults (and options).' );
 
   return {
     %{ $self->default_config } ,
@@ -99,6 +98,9 @@ sub _build_config {
     %{ $self->cli_opts } ,
   };
 }
+
+# this is down here so it will see the 'get_config' delegation...
+with 'HiD::Role::DoesLogging';
 
 
 has config_file => (
@@ -118,6 +120,7 @@ has default_config => (
     layout_dir  => '_layouts' ,
     plugin_dir  => '_plugins' ,
     posts_dir   => '_posts' ,
+    drafts_dir  => '_drafts' ,
     source      => '.' ,
   }},
 );
@@ -132,6 +135,13 @@ has destination => (
     make_path $dest unless -e -d $dest;
     return $dest;
   },
+);
+
+
+has draft_post_file_regex => (
+  is      => 'ro' ,
+  isa     => 'RegexpRef' ,
+  default => sub { qr/^(?:.+?)\.(?:mk|mkd|mkdn|markdown|md|mmd|text|textile|html)$/ },
 );
 
 
@@ -189,6 +199,8 @@ has layouts => (
 sub _build_layouts {
   my $self = shift;
 
+  $self->INFO( "Building layouts" );
+
   my @layout_files = File::Find::Rule->file
     ->in( $self->layout_dir );
 
@@ -205,6 +217,8 @@ sub _build_layouts {
     });
 
     $self->add_input( $layout_file => 'layout' );
+
+    $self->DEBUG( "* Added layout $layout_file" );
   }
 
   foreach my $layout_name ( keys %layouts ) {
@@ -245,7 +259,7 @@ has objects => (
 has page_file_regex => (
   is      => 'ro' ,
   isa     => 'RegexpRef',
-  default => sub { qr/\.(mk|mkd|mkdn|markdown|textile|html|htm|xml|xhtml|xhtm|shtm|shtml|rss)$/ } ,
+  default => sub { qr/\.(mk|mkd|mkdn|markdown|mmd|textile|html|htm|xml|xhtml|xhtm|shtm|shtml|rss)$/ } ,
 );
 
 
@@ -261,6 +275,8 @@ sub _build_pages {
 
   # build posts before pages
   $self->posts;
+
+  $self->INFO( "Posts built." );
 
   my @potential_pages = File::Find::Rule->file->
     name( $self->page_file_regex )->in( '.' );
@@ -301,7 +317,7 @@ has plugin_dir => (
 
 has plugins => (
   is      => 'ro' ,
-  isa     => 'Maybe[ArrayRef[HiD::Plugin]]' ,
+  isa     => 'ArrayRef[Pluginish]' ,
   lazy    => 1 ,
   builder => '_build_plugins' ,
 );
@@ -309,41 +325,62 @@ has plugins => (
 sub _build_plugins {
   my $self = shift;
 
-  return undef unless $self->plugin_dir;
+  my @loaded_plugins;
 
-  # default plugin modules in HiD
-  my @def_mods = findallmod "Plugin";
+  if ( my $plugin_list = $self->config->{plugins} ){
+    my @plugins = ( ref $plugin_list eq 'ARRAY' ) ? @$plugin_list
+      : (split /\s+/ , $plugin_list );
 
-  # plugin modules in plugin_dir
-  setmoduledirs $self->plugin_dir;
-  my @mods = map { s/^\.:://r } findallmod ".";
+    foreach ( @plugins ) {
 
-  # load plugin modules
-  my @all_plugins;
-
-  push @INC , $self->plugin_dir;
-
-  foreach my $m ( @mods , @def_mods ) {
-    my( $lrlt , $lerr ) = try_load_class( $m );
-
-    warn "plugin $m cannot be loaded : $lerr \n" and next
-      unless $lrlt;
-
-    $m->isa('HiD::Plugin')
-      or warn "plugin $m is not a valid plugin. Plugins must inherit from HiD::Plugin\n"
-        and next;
-
-    push @all_plugins, $m;
+      my $plugin_name = ( /^\+/ ) ? $_ : "HiD::Generator::$_";
+      $self->INFO( "* Loading plugin $plugin_name" );
+      next unless _load_plugin_or_warn( $plugin_name );
+      push @loaded_plugins , $plugin_name->new;
+    }
   }
 
-  return @all_plugins ? \@all_plugins : undef;
+  if ( my $plugin_dir = $self->plugin_dir ) {
+    # plugin modules in plugin_dir
+    my @mods = File::Find::Rule->file->
+      name( '*.pm' )->in( $plugin_dir );
+
+    push @INC , $plugin_dir;
+
+    foreach my $m ( @mods ) {
+      $m =~ s|$plugin_dir/?||;
+      $m =~ s|.pm$||;
+      $self->INFO("* Loading plugin $m" );
+      next unless _load_plugin_or_warn( $m );
+      push @loaded_plugins, $m->new;
+    }
+  }
+
+  return \@loaded_plugins;
+}
+
+sub _load_plugin_or_warn {
+  my $plugin = shift;
+
+  my( $lrlt , $lerr ) = try_load_class( $plugin );
+
+  warn "plugin $plugin cannot be loaded : $lerr \n" and return undef
+    unless $lrlt;
+
+  ( $plugin->isa('HiD::Plugin') or
+    $plugin->does('HiD::Plugin') or
+    $plugin->does('HiD::Generator') )
+    or warn "plugin $plugin is not a valid plugin.\n"
+      and return undef;
+
+  return 1;
 }
 
 
 has post_file_regex => (
   is      => 'ro' ,
   isa     => 'RegexpRef' ,
-  default => sub { qr/^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}-(?:.+?)\.(?:mk|mkd|mkdn|markdown|md|text|textile|html)$/ },
+  default => sub { qr/^[0-9]{4}-[0-9]{1,2}-[0-9]{1,2}-(?:.+?)\.(?:mk|mkd|mkdn|markdown|md|mmd|text|textile|html)$/ },
 );
 
 
@@ -357,7 +394,9 @@ has posts_dir => (
 
 has posts => (
   is      => 'ro' ,
-  isa     => 'Maybe[ArrayRef[HiD::Post]]' ,
+  isa     => 'ArrayRef[HiD_Post]' ,
+  traits  => [ qw/ Array / ] ,
+  handles => { posts_size => 'count' } ,
   lazy    => 1 ,
   builder => '_build_posts' ,
 );
@@ -368,18 +407,27 @@ sub _build_posts {
   # build layouts before posts
   $self->layouts;
 
+  $self->INFO("Layouts built.");
+
+  $self->INFO("Building posts." );
+
   my $rule = File::Find::Rule->new;
 
   my @posts_directories = $rule->or(
-    $rule->new->directory->name( '_posts' ) ,
-      $rule->new->directory->name( '_site' )->prune->discard ,
+    $rule->new->directory->name( $self->get_config( 'posts_dir' )) ,
+    $rule->new->directory->name( $self->get_config( 'destination' ))->prune->discard ,
   )->in( $self->source );
 
   my @potential_posts = File::Find::Rule->file
     ->name( $self->post_file_regex )->in( @posts_directories );
 
+  if ( $self->get_config( 'publish_drafts' )){
+    push @potential_posts , $self->_build_potential_draft_posts_list ,
+  }
+
   my @posts = grep { $_ } map {
     try {
+      $self->DEBUG( "* Trying to build post $_" );
       my $post = HiD::Post->new({
         dest_dir       => $self->destination,
         hid            => $self ,
@@ -388,9 +436,10 @@ sub _build_posts {
       });
       $self->add_input( $_ => 'post' );
       $self->add_object( $post );
+      $self->DEBUG( "* Built post $_" );
       $post;
     }
-    catch { 0 };
+    catch { $self->ERROR( "ERROR: Post failed to build: $_" ) ; return 0 };
   } @potential_posts;
 
   @posts = sort { $b->date <=> $a->date } @posts;
@@ -403,6 +452,22 @@ sub _build_posts {
   return \@posts;
 }
 
+sub _build_potential_draft_posts_list {
+  my( $self ) = @_;
+
+  my $rule = File::Find::Rule->new;
+
+  my @posts_directories = $rule->or(
+    $rule->new->directory->name( $self->get_config( 'drafts_dir' )) ,
+    $rule->new->directory->name( $self->get_config( 'destination' ))->prune->discard ,
+  )->in( $self->source );
+
+  my @potential_posts = File::Find::Rule->file
+    ->name( $self->draft_post_file_regex )->in( @posts_directories );
+
+  return @potential_posts;
+}
+
 
 has processor => (
   is      => 'ro' ,
@@ -411,7 +476,7 @@ has processor => (
   default => sub {
     my $self = shift;
 
-    my $processor_name  = $self->get_config( 'processor_name' ) // 'Template';
+    my $processor_name  = $self->get_config( 'processor_name' ) // 'Handlebars';
 
     my $processor_class = ( $processor_name =~ /^\+/ ) ? $processor_name
       : "HiD::Processor::$processor_name";
@@ -433,13 +498,11 @@ has processor_args => (
     return $self->get_config( 'processor_args' ) if
       defined $self->get_config( 'processor_args' );
 
-    my $include_path = $self->layout_dir;
-    $include_path   .= ':' . $self->include_dir
+    my @path = ( $self->layout_dir );
+    push @path , $self->include_dir
       if defined $self->include_dir;
 
-    return {
-      INCLUDE_PATH => $include_path ,
-    };
+    return { path => \@path };
   },
 );
 
@@ -456,6 +519,8 @@ sub _build_regular_files {
 
   # build pages before regular files
   $self->pages;
+
+  $self->INFO( "Pages built" );
 
   my @potential_files = File::Find::Rule->file->in( '.' );
 
@@ -476,6 +541,20 @@ sub _build_regular_files {
 
   return \@files;
 }
+
+
+has remove_unwritten_files => (
+  is => 'ro' ,
+  isa => 'Bool' ,
+  lazy => 1 ,
+  default => sub {
+    my $self = shift;
+    return $self->get_config('remove_unwritten_files')
+      if defined $self->get_config('remove_unwritten_files');
+
+    return 1;
+  },
+);
 
 
 has source => (
@@ -511,6 +590,15 @@ sub _build_tags {
 }
 
 
+has time => (
+  is       => 'ro',
+  isa      => 'DateTime' ,
+  init_arg => undef ,
+  default  => sub { DateTime->now() } ,
+);
+
+
+
 has written_files => (
   is      => 'ro' ,
   isa     => 'HashRef' ,
@@ -527,13 +615,61 @@ has written_files => (
 sub publish {
   my( $self ) = @_;
 
-  # bootstrap data structures -- FIXME should have a more explicit way to do this
+  $self->INFO( "publish" );
+
+  # bootstrap data structures
+  # FIXME should have a more explicit way to do this
   $self->regular_files;
+
+  $self->INFO( "files bootstrapped" );
 
   $self->add_written_file( $self->destination => '_site_dir' );
 
+  $self->INFO( "processing plugins for generate()" );
+
+  foreach my $plugin ( @{ $self->plugins } ) {
+    if ( $plugin->does( 'HiD::Generator' )) {
+      $plugin->generate($self)
+    }
+  }
+
+  if ( $self->config->{pagination} ){
+    my $entries_per_page = $self->config->{pagination}{entries}
+      or die "Must set 'pagination.entries' key in pagination config";
+
+    my $page_fstring = $self->config->{pagination}{page}
+      or die "Must set 'pagination.page' key in pagination config";
+
+    my $template = $self->config->{pagination}{template}
+      or die "Must set 'pagination.template' key in pagination config";
+
+    my $pager = HiD::Pager->new({
+      entries             => $self->posts ,
+      entries_per_page    => $entries_per_page ,
+      hid                 => $self ,
+      page_pattern        => $page_fstring
+    });
+
+    while ( my $page_data = $pager->next ) {
+      my $page = HiD::Page->new({
+        dest_dir       => $self->destination ,
+        hid            => $self ,
+        input_filename => $template ,
+        layouts        => $self->layouts ,
+        url            => $page_data->{current_page_url} ,
+      });
+      $page->metadata->{page_data} = $page_data;
+
+      $self->add_input( "Paged page $page_data->{page_number}" => 'page' );
+      $self->add_object( $page );
+    }
+  }
+
+
   foreach my $file ( $self->all_objects ) {
     $file->publish;
+
+    $self->INFO( sprintf "* Published %s" , $file->output_filename );
 
     my $path;
     foreach my $part ( split '/' , $file->output_filename ) {
@@ -542,18 +678,25 @@ sub publish {
     }
   }
 
-  foreach ( File::Find::Rule->in( $self->destination )) {
-    $self->wrote_file($_) or remove \1 , $_;
+  if ( $self->remove_unwritten_files ) {
+    foreach ( File::Find::Rule->in( $self->destination )) {
+      $self->wrote_file($_) or remove \1 , $_;
+    }
   }
 
-  # execute PLUGINS
   return 1 unless $self->plugins;
 
-  foreach my $p (@{$self->plugins}) {
-      $p->new->after_publish($self);
-  }
-  1;
+  $self->INFO( "processing plugins for after_publish()" );
 
+  foreach my $plugin ( @{ $self->plugins } ) {
+    if ( $plugin->does( 'HiD::Plugin' ) or
+         ### FIXME remove after 13 Nov 2014
+         $plugin->isa( 'HiD::Plugin'  )) {
+      $plugin->after_publish($self)
+    }
+  }
+
+  1;
 }
 
 
@@ -612,6 +755,7 @@ Hashref of standard configuration options. The default config is:
     layout_dir  => '_layouts' ,
     plugin_dir  => '_plugins' ,
     posts_dir   => '_posts' ,
+    drafts_dir  => '_drafts' ,
     source      => '.' ,
 
 =head2 destination
@@ -619,6 +763,15 @@ Hashref of standard configuration options. The default config is:
 Directory to write output files into.
 
 B<N.B.:> If it doesn't exist and is needed, it will be created.
+
+=head2 draft_post_file_regex
+
+Regular expression for which files will be recognized as draft blog posts.
+
+FIXME should this be configurable?
+
+FIXME this and post_file_regex should probably be built based on a common
+underlying "post_extensions_regex" attr...
 
 =head2 excerpt_separator
 
@@ -669,7 +822,10 @@ Directory for plugins, which will be called after publish.
 
 =head2 plugins
 
-Plugins, called after publish.
+Plugins, which consume either of the L<HiD::Plugin> or L<HiD::Generator> roles.
+
+Plugins used to subclass L<HiD::Plugin>, but that behavior is deprecated and
+will be removed on or after 13 Nov 2014.
 
 =head2 post_file_regex
 
@@ -702,6 +858,15 @@ Defaults to appropriate Template Toolkit arguments.
 
 ArrayRef of L<HiD::File> objects, populated during processing.
 
+=head2 remove_unwritten_files ( Boolean )
+
+Boolean value controlling whether files found in the C<dest_dir> that weren't
+produced by HiD should be removed. In other words, when this is true, after a
+C<hid publish> run, only files produced by HiD will be found in the
+C<dest_dir>.
+
+Defaults to true.
+
 =head2 source
 
 Base directory that all other paths are calculated relative to.
@@ -709,6 +874,12 @@ Base directory that all other paths are calculated relative to.
 =head2 tags
 
 Tags hash, contains (tag, posts) pairs
+
+=head2 time
+
+DateTime object from the start of the latest run of the system.
+
+Cannot be set via argument.
 
 =head2 written_files
 
@@ -810,7 +981,7 @@ L<StaticVolt>
 
 =head1 VERSION
 
-version 1.0
+version 1.1
 
 =head1 AUTHOR
 
