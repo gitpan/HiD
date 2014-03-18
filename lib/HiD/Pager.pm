@@ -2,7 +2,7 @@
 
 
 package HiD::Pager;
-$HiD::Pager::VERSION = '1.1';
+$HiD::Pager::VERSION = '1.2';
 BEGIN {
   $HiD::Pager::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -259,7 +259,7 @@ Returns the URL for the previous page in the set.
 
 =head1 VERSION
 
-version 1.1
+version 1.2
 
 =head1 AUTHOR
 

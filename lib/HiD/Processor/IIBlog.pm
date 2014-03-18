@@ -2,7 +2,7 @@
 
 
 package HiD::Processor::IIBlog;
-$HiD::Processor::IIBlog::VERSION = '1.1';
+$HiD::Processor::IIBlog::VERSION = '1.2';
 BEGIN {
   $HiD::Processor::IIBlog::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -81,7 +81,7 @@ publication.
 
 =head1 VERSION
 
-version 1.1
+version 1.2
 
 =head1 AUTHOR
 

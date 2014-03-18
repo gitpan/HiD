@@ -44,6 +44,7 @@ my %WriteMakefileArgs = (
     "Moose::Util::TypeConstraints" => 0,
     "MooseX::App::Cmd" => 0,
     "MooseX::App::Cmd::Command" => 0,
+    "MooseX::Getopt" => 0,
     "Path::Class" => 0,
     "Plack::App::File" => 0,
     "Plack::Runner" => 0,
@@ -87,7 +88,7 @@ my %WriteMakefileArgs = (
     "Test::Warn" => 0,
     "YAML" => 0
   },
-  "VERSION" => "1.1",
+  "VERSION" => "1.2",
   "test" => {
     "TESTS" => "t/*.t"
   }
@@ -123,6 +124,7 @@ my %FallbackPrereqs = (
   "Moose::Util::TypeConstraints" => 0,
   "MooseX::App::Cmd" => 0,
   "MooseX::App::Cmd::Command" => 0,
+  "MooseX::Getopt" => 0,
   "Path::Class" => 0,
   "Plack::App::File" => 0,
   "Plack::Runner" => 0,

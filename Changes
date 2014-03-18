@@ -1,5 +1,9 @@
 Revision history for HiD
 
+1.2       2014-03-17 20:00:19-07:00 America/Los_Angeles
+
+        Add explict MooseX::Getopt dep
+
 1.1       2014-03-17 11:11:57-07:00 America/Los_Angeles
 
         Added 'author' attribute to 'is_post'

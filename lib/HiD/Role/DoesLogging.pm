@@ -1,7 +1,7 @@
 #ABSTRACT: Logging role
 
 package HiD::Role::DoesLogging;
-$HiD::Role::DoesLogging::VERSION = '1.1';
+$HiD::Role::DoesLogging::VERSION = '1.2';
 BEGIN {
   $HiD::Role::DoesLogging::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -99,7 +99,7 @@ Log4perl object for logging. Handles:
 
 =head1 VERSION
 
-version 1.1
+version 1.2
 
 =head1 AUTHOR
 

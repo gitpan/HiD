@@ -2,7 +2,7 @@
 
 
 package HiD::App::Command;
-$HiD::App::Command::VERSION = '1.1';
+$HiD::App::Command::VERSION = '1.2';
 BEGIN {
   $HiD::App::Command::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -109,7 +109,7 @@ Defaults to './_config.yml'
 
 =head1 VERSION
 
-version 1.1
+version 1.2
 
 =head1 AUTHOR
 

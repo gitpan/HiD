@@ -49,6 +49,7 @@
             "Moose::Util::TypeConstraints" : "0",
             "MooseX::App::Cmd" : "0",
             "MooseX::App::Cmd::Command" : "0",
+            "MooseX::Getopt" : "0",
             "Path::Class" : "0",
             "Plack::App::File" : "0",
             "Plack::Runner" : "0",
@@ -110,7 +111,7 @@
          "web" : "https://github.com/genehack/HiD"
       }
    },
-   "version" : "1.1",
+   "version" : "1.2",
    "x_Dist_Zilla" : {
       "perl" : {
          "version" : "5.018001"

@@ -2,7 +2,7 @@
 
 
 package HiD::Processor::Handlebars;
-$HiD::Processor::Handlebars::VERSION = '1.1';
+$HiD::Processor::Handlebars::VERSION = '1.2';
 BEGIN {
   $HiD::Processor::Handlebars::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -68,7 +68,7 @@ Wraps up a L<Text::Handlebars> object and allows it to be used during HiD public
 
 =head1 VERSION
 
-version 1.1
+version 1.2
 
 =head1 AUTHOR
 

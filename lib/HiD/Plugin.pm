@@ -2,7 +2,7 @@
 
 
 package HiD::Plugin;
-$HiD::Plugin::VERSION = '1.1';
+$HiD::Plugin::VERSION = '1.2';
 BEGIN {
   $HiD::Plugin::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -47,7 +47,7 @@ Base class for plugin object
 
 =head1 VERSION
 
-version 1.1
+version 1.2
 
 =head1 AUTHOR
 

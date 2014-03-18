@@ -2,7 +2,7 @@
 
 
 package HiD::Layout;
-$HiD::Layout::VERSION = '1.1';
+$HiD::Layout::VERSION = '1.2';
 BEGIN {
   $HiD::Layout::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -206,7 +206,7 @@ Will recurse into embedded layouts as needed.
 
 =head1 VERSION
 
-version 1.1
+version 1.2
 
 =head1 AUTHOR
 

@@ -2,7 +2,7 @@
 
 
 package HiD::Role::IsPost;
-$HiD::Role::IsPost::VERSION = '1.1';
+$HiD::Role::IsPost::VERSION = '1.2';
 BEGIN {
   $HiD::Role::IsPost::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -273,7 +273,7 @@ folder or not.
 
 =head1 VERSION
 
-version 1.1
+version 1.2
 
 =head1 AUTHOR
 

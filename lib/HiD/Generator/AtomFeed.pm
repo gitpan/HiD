@@ -2,7 +2,7 @@
 
 
 package HiD::Generator::AtomFeed;
-$HiD::Generator::AtomFeed::VERSION = '1.1';
+$HiD::Generator::AtomFeed::VERSION = '1.2';
 BEGIN {
   $HiD::Generator::AtomFeed::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -133,7 +133,7 @@ feed, respectively.
 
 =head1 VERSION
 
-version 1.1
+version 1.2
 
 =head1 AUTHOR
 
