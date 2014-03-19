@@ -2,7 +2,7 @@
 
 
 package HiD::Role::IsPublished;
-$HiD::Role::IsPublished::VERSION = '1.2';
+$HiD::Role::IsPublished::VERSION = '1.3';
 BEGIN {
   $HiD::Role::IsPublished::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -192,7 +192,7 @@ The URL to the output path for the written file.
 
 =head1 VERSION
 
-version 1.2
+version 1.3
 
 =head1 AUTHOR
 
@@ -200,7 +200,7 @@ John SJ Anderson <genehack@genehack.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by John SJ Anderson.
+This software is copyright (c) 2014 by John SJ Anderson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

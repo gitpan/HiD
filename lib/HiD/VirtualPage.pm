@@ -2,7 +2,7 @@
 
 
 package HiD::VirtualPage;
-$HiD::VirtualPage::VERSION = '1.2';
+$HiD::VirtualPage::VERSION = '1.3';
 BEGIN {
   $HiD::VirtualPage::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -87,7 +87,7 @@ Publish -- write out to disk -- this data from this object.
 
 =head1 VERSION
 
-version 1.2
+version 1.3
 
 =head1 AUTHOR
 
@@ -95,7 +95,7 @@ John SJ Anderson <genehack@genehack.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by John SJ Anderson.
+This software is copyright (c) 2014 by John SJ Anderson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

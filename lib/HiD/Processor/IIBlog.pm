@@ -2,7 +2,7 @@
 
 
 package HiD::Processor::IIBlog;
-$HiD::Processor::IIBlog::VERSION = '1.2';
+$HiD::Processor::IIBlog::VERSION = '1.3';
 BEGIN {
   $HiD::Processor::IIBlog::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -81,7 +81,7 @@ publication.
 
 =head1 VERSION
 
-version 1.2
+version 1.3
 
 =head1 AUTHOR
 
@@ -89,7 +89,7 @@ John SJ Anderson <genehack@genehack.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by John SJ Anderson.
+This software is copyright (c) 2014 by John SJ Anderson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

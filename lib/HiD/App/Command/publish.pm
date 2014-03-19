@@ -2,7 +2,7 @@
 
 
 package HiD::App::Command::publish;
-$HiD::App::Command::publish::VERSION = '1.2';
+$HiD::App::Command::publish::VERSION = '1.3';
 BEGIN {
   $HiD::App::Command::publish::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -20,6 +20,14 @@ use charnames   qw/ :full           /;
 use feature     qw/ unicode_strings /;
 
 
+has clean => (
+  is          => 'ro' ,
+  isa         => 'Bool' ,
+  cmd_aliases => 'C' ,
+  traits      => [ 'Getopt' ] ,
+);
+
+
 has limit_posts => (
   is          => 'ro' ,
   isa         => 'Int' ,
@@ -30,7 +38,11 @@ has limit_posts => (
 sub _run {
   my( $self , $opts , $args ) = @_;
 
-  my $config = {};
+  my $config = $self->config;
+  if ( $self->clean ) {
+    $config->{clean_destination} = 1;
+  }
+
   if ( $self->limit_posts ) {
     $config->{limit_posts} = $self->limit_posts;
   }
@@ -68,6 +80,10 @@ accordingly.
 
 =head1 ATTRIBUTES
 
+=head2 clean
+
+Remove any existing site directory prior to the publication run
+
 =head2 limit_posts
 
 Limit the number of blog posts that will be written out. If you have a large
@@ -81,7 +97,7 @@ sub commands.
 
 =head1 VERSION
 
-version 1.2
+version 1.3
 
 =head1 AUTHOR
 
@@ -89,7 +105,7 @@ John SJ Anderson <genehack@genehack.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by John SJ Anderson.
+This software is copyright (c) 2014 by John SJ Anderson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

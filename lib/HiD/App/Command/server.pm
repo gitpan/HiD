@@ -2,7 +2,7 @@
 
 
 package HiD::App::Command::server;
-$HiD::App::Command::server::VERSION = '1.2';
+$HiD::App::Command::server::VERSION = '1.3';
 BEGIN {
   $HiD::App::Command::server::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -57,7 +57,11 @@ sub _build_port {
 sub _run {
   my( $self , $opts , $args ) = @_;
 
-  my $config = {};
+  my $config = $self->config;
+  if ( $self->clean ) {
+    $config->{clean_destination} = 1;
+  }
+
   if ( $self->publish_drafts ){
     $config->{publish_drafts} = 1;
   }
@@ -155,7 +159,7 @@ sub commands.
 
 =head1 VERSION
 
-version 1.2
+version 1.3
 
 =head1 AUTHOR
 
@@ -163,7 +167,7 @@ John SJ Anderson <genehack@genehack.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by John SJ Anderson.
+This software is copyright (c) 2014 by John SJ Anderson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

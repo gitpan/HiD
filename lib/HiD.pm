@@ -2,7 +2,7 @@
 
 
 package HiD;
-$HiD::VERSION = '1.2';
+$HiD::VERSION = '1.3';
 BEGIN {
   $HiD::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -615,6 +615,12 @@ has written_files => (
 sub publish {
   my( $self ) = @_;
 
+  if ( -e $self->destination && $self->get_config( 'clean_destination' )){
+    remove( \1 , $self->destination );
+    $self->INFO( "cleaned destination directory" );
+    make_path $self->destination;
+  }
+
   $self->INFO( "publish" );
 
   # bootstrap data structures
@@ -981,7 +987,7 @@ L<StaticVolt>
 
 =head1 VERSION
 
-version 1.2
+version 1.3
 
 =head1 AUTHOR
 
@@ -989,7 +995,7 @@ John SJ Anderson <genehack@genehack.org>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2012 by John SJ Anderson.
+This software is copyright (c) 2014 by John SJ Anderson.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
