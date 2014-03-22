@@ -2,7 +2,7 @@
 
 
 package HiD;
-$HiD::VERSION = '1.3';
+$HiD::VERSION = '1.4';
 BEGIN {
   $HiD::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -115,13 +115,14 @@ has default_config => (
   traits   => [ 'Hash' ] ,
   init_arg => undef ,
   default  => sub{{
-    destination => '_site'    ,
-    include_dir => '_includes',
-    layout_dir  => '_layouts' ,
-    plugin_dir  => '_plugins' ,
-    posts_dir   => '_posts' ,
-    drafts_dir  => '_drafts' ,
-    source      => '.' ,
+    default_author => 'your name here!' ,
+    destination    => '_site'    ,
+    include_dir    => '_includes',
+    layout_dir     => '_layouts' ,
+    plugin_dir     => '_plugins' ,
+    posts_dir      => '_posts' ,
+    drafts_dir     => '_drafts' ,
+    source         => '.' ,
   }},
 );
 
@@ -987,7 +988,7 @@ L<StaticVolt>
 
 =head1 VERSION
 
-version 1.3
+version 1.4
 
 =head1 AUTHOR
 

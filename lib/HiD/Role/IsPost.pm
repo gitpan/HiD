@@ -2,7 +2,7 @@
 
 
 package HiD::Role::IsPost;
-$HiD::Role::IsPost::VERSION = '1.3';
+$HiD::Role::IsPost::VERSION = '1.4';
 BEGIN {
   $HiD::Role::IsPost::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -35,10 +35,10 @@ sub _build_author {
   my $self = shift;
 
   my $author = $self->get_metadata( 'author' );
-
   return $author if defined $author;
 
-  return 'DRAFT AUTHOR -- FIX' if $self->is_draft;
+  my $default_author = $self->get_config( 'default_author' );
+  return $default_author if defined $default_author;
 
   die "Need author for " . $self->basename . "\n"
 }
@@ -105,6 +105,12 @@ has date => (
 );
 
 
+has description => (
+  is      => 'ro' ,
+  isa     => 'Maybe[Str]' ,
+);
+
+
 has excerpt => (
   is      => 'ro',
   isa     => 'Str',
@@ -132,6 +138,8 @@ sub _build_excerpt {
 has tags => (
   is      => 'ro' ,
   isa     => 'ArrayRef',
+  traits  => [ qw/ Array / ] ,
+  handles => { join_tags => 'join' } ,
   default => sub {
     my $self = shift;
 
@@ -205,6 +213,9 @@ around BUILDARGS => sub {
 };
 
 
+sub all_tags { shift->join_tags(',') }
+
+
 my $drafts_dir;
 sub is_draft {
   my $self = shift;
@@ -252,6 +263,10 @@ post-specific attributes and methods.
 
 DateTime object for this post.
 
+=head2 description
+
+A one-line synopsis of the post (used, e.g., for metadata information used by Open Graph)
+
 =head2 excerpt
 
 It is generally useful to summarize or lead a post with a "read more" tag
@@ -266,6 +281,10 @@ want to list the full post on the front page.
 
 =head1 METHODS
 
+=head2 all_tags
+
+Returns all tags for this post, joined together with commas
+
 =head2 is_draft
 
 Returns a boolean value indicating whether this post is coming from the drafts
@@ -273,7 +292,7 @@ folder or not.
 
 =head1 VERSION
 
-version 1.3
+version 1.4
 
 =head1 AUTHOR
 

@@ -2,7 +2,7 @@
 
 
 package HiD::Role::IsPublished;
-$HiD::Role::IsPublished::VERSION = '1.3';
+$HiD::Role::IsPublished::VERSION = '1.4';
 BEGIN {
   $HiD::Role::IsPublished::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -192,7 +192,7 @@ The URL to the output path for the written file.
 
 =head1 VERSION
 
-version 1.3
+version 1.4
 
 =head1 AUTHOR
 

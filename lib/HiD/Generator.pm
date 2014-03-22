@@ -2,7 +2,7 @@
 
 
 package HiD::Generator;
-$HiD::Generator::VERSION = '1.3';
+$HiD::Generator::VERSION = '1.4';
 BEGIN {
   $HiD::Generator::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -52,7 +52,7 @@ $site->posts >> and so on.
 
 =head1 VERSION
 
-version 1.3
+version 1.4
 
 =head1 AUTHOR
 

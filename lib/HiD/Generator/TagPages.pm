@@ -2,7 +2,7 @@
 
 
 package HiD::Generator::TagPages;
-$HiD::Generator::TagPages::VERSION = '1.3';
+$HiD::Generator::TagPages::VERSION = '1.4';
 BEGIN {
   $HiD::Generator::TagPages::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -88,7 +88,7 @@ directory and modifying it directly.
 
 =head1 VERSION
 
-version 1.3
+version 1.4
 
 =head1 AUTHOR
 

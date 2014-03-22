@@ -26,7 +26,7 @@
 
   <url>
     <loc>http://example.com</loc>
-    <lastmod>2014-03-17T17:31:38</lastmod>
+    <lastmod>2014-03-22T22:44:32</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
@@ -43,7 +43,7 @@
   {% for page in site.html_pages %}
   <url>
     <loc>http://example.com./sitemap.xml</loc>
-    <lastmod>2014-03-17T17:31:38</lastmod>
+    <lastmod>2014-03-22T22:44:32</lastmod>
     {% if page.changefreq %}<changefreq></changefreq>{% endif %}
     {% if page.priority %}<priority></priority>{% endif %}
   </url>

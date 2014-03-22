@@ -2,7 +2,7 @@
 
 
 package HiD::Role::IsConverted;
-$HiD::Role::IsConverted::VERSION = '1.3';
+$HiD::Role::IsConverted::VERSION = '1.4';
 BEGIN {
   $HiD::Role::IsConverted::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -146,7 +146,11 @@ has template_data => (
       site     => $self->hid ,
     };
 
-    foreach my $method ( qw/ categories date tags title url / ) {
+    $data->{page}{baseurl} = $self->hid->config->{baseurl};
+
+    ## FIXME this sucks, you need a better way to deal with this...
+    foreach my $method ( qw/ all_tags author categories date
+                             metadata tags title url year / ) {
       $data->{page}{$method} = $self->$method
         if $self->can( $method );
     }
@@ -285,7 +289,7 @@ Data for passing to template processing function.
 
 =head1 VERSION
 
-version 1.3
+version 1.4
 
 =head1 AUTHOR
 

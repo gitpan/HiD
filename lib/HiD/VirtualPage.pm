@@ -2,7 +2,7 @@
 
 
 package HiD::VirtualPage;
-$HiD::VirtualPage::VERSION = '1.3';
+$HiD::VirtualPage::VERSION = '1.4';
 BEGIN {
   $HiD::VirtualPage::AUTHORITY = 'cpan:GENEHACK';
 }
@@ -87,7 +87,7 @@ Publish -- write out to disk -- this data from this object.
 
 =head1 VERSION
 
-version 1.3
+version 1.4
 
 =head1 AUTHOR
 
