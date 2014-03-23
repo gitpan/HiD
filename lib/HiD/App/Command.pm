@@ -2,10 +2,7 @@
 
 
 package HiD::App::Command;
-$HiD::App::Command::VERSION = '1.4';
-BEGIN {
-  $HiD::App::Command::AUTHORITY = 'cpan:GENEHACK';
-}
+$HiD::App::Command::VERSION = '1.5';
 use Moose;
 extends 'MooseX::App::Cmd::Command';
 use namespace::autoclean;
@@ -109,7 +106,7 @@ Defaults to './_config.yml'
 
 =head1 VERSION
 
-version 1.4
+version 1.5
 
 =head1 AUTHOR
 

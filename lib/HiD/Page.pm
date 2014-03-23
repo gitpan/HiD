@@ -2,10 +2,7 @@
 
 
 package HiD::Page;
-$HiD::Page::VERSION = '1.4';
-BEGIN {
-  $HiD::Page::AUTHORITY = 'cpan:GENEHACK';
-}
+$HiD::Page::VERSION = '1.5';
 use Moose;
 with 'HiD::Role::IsConverted';
 with 'HiD::Role::IsPublished';
@@ -112,7 +109,7 @@ object from this class works.
 
 =head1 VERSION
 
-version 1.4
+version 1.5
 
 =head1 AUTHOR
 

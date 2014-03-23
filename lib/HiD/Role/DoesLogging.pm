@@ -1,10 +1,7 @@
 #ABSTRACT: Logging role
 
 package HiD::Role::DoesLogging;
-$HiD::Role::DoesLogging::VERSION = '1.4';
-BEGIN {
-  $HiD::Role::DoesLogging::AUTHORITY = 'cpan:GENEHACK';
-}
+$HiD::Role::DoesLogging::VERSION = '1.5';
 use Moose::Role;
 
 use Log::Log4perl;
@@ -99,7 +96,7 @@ Log4perl object for logging. Handles:
 
 =head1 VERSION
 
-version 1.4
+version 1.5
 
 =head1 AUTHOR
 

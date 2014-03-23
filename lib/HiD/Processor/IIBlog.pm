@@ -2,10 +2,7 @@
 
 
 package HiD::Processor::IIBlog;
-$HiD::Processor::IIBlog::VERSION = '1.4';
-BEGIN {
-  $HiD::Processor::IIBlog::AUTHORITY = 'cpan:GENEHACK';
-}
+$HiD::Processor::IIBlog::VERSION = '1.5';
 use Moose;
 extends 'HiD::Processor';
 use namespace::autoclean;
@@ -81,7 +78,7 @@ publication.
 
 =head1 VERSION
 
-version 1.4
+version 1.5
 
 =head1 AUTHOR
 

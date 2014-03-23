@@ -2,10 +2,7 @@
 
 
 package HiD::Processor::Template;
-$HiD::Processor::Template::VERSION = '1.4';
-BEGIN {
-  $HiD::Processor::Template::AUTHORITY = 'cpan:GENEHACK';
-}
+$HiD::Processor::Template::VERSION = '1.5';
 use Moose;
 extends 'HiD::Processor';
 use namespace::autoclean;
@@ -61,7 +58,7 @@ Wraps up a L<Template> object and allows it to be used during HiD publication.
 
 =head1 VERSION
 
-version 1.4
+version 1.5
 
 =head1 AUTHOR
 

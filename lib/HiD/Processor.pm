@@ -2,10 +2,7 @@
 
 
 package HiD::Processor;
-$HiD::Processor::VERSION = '1.4';
-BEGIN {
-  $HiD::Processor::AUTHORITY = 'cpan:GENEHACK';
-}
+$HiD::Processor::VERSION = '1.5';
 use Moose;
 use namespace::autoclean;
 
@@ -56,7 +53,7 @@ implements a 'process' method.
 
 =head1 VERSION
 
-version 1.4
+version 1.5
 
 =head1 AUTHOR
 

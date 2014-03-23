@@ -2,10 +2,7 @@
 
 
 package HiD::App::Command::publish;
-$HiD::App::Command::publish::VERSION = '1.4';
-BEGIN {
-  $HiD::App::Command::publish::AUTHORITY = 'cpan:GENEHACK';
-}
+$HiD::App::Command::publish::VERSION = '1.5';
 use Moose;
 extends 'HiD::App::Command';
 with 'HiD::Role::PublishesDrafts';
@@ -97,7 +94,7 @@ sub commands.
 
 =head1 VERSION
 
-version 1.4
+version 1.5
 
 =head1 AUTHOR
 

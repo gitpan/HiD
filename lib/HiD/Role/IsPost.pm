@@ -2,10 +2,7 @@
 
 
 package HiD::Role::IsPost;
-$HiD::Role::IsPost::VERSION = '1.4';
-BEGIN {
-  $HiD::Role::IsPost::AUTHORITY = 'cpan:GENEHACK';
-}
+$HiD::Role::IsPost::VERSION = '1.5';
 use Moose::Role;
 use namespace::autoclean;
 
@@ -108,7 +105,10 @@ has date => (
 has description => (
   is      => 'ro' ,
   isa     => 'Maybe[Str]' ,
+  lazy    => 1 ,
+  builder => '_build_description' ,
 );
+sub _build_description { shift->get_metadata( 'description' ) }
 
 
 has excerpt => (
@@ -292,7 +292,7 @@ folder or not.
 
 =head1 VERSION
 
-version 1.4
+version 1.5
 
 =head1 AUTHOR
 

@@ -2,10 +2,7 @@
 
 
 package HiD::Role::IsConverted;
-$HiD::Role::IsConverted::VERSION = '1.4';
-BEGIN {
-  $HiD::Role::IsConverted::AUTHORITY = 'cpan:GENEHACK';
-}
+$HiD::Role::IsConverted::VERSION = '1.5';
 use Moose::Role;
 use namespace::autoclean;
 
@@ -141,19 +138,14 @@ has template_data => (
     my $self = shift;
 
     my $data = {
+      baseurl  => $self->hid->config->{baseurl} ,
       content  => $self->converted_content ,
       page     => $self->metadata ,
       site     => $self->hid ,
     };
+    $data->{post} = $self if $self->does('HiD::Role::IsPost');
 
-    $data->{page}{baseurl} = $self->hid->config->{baseurl};
-
-    ## FIXME this sucks, you need a better way to deal with this...
-    foreach my $method ( qw/ all_tags author categories date
-                             metadata tags title url year / ) {
-      $data->{page}{$method} = $self->$method
-        if $self->can( $method );
-    }
+    $data->{page}{url} = $self->url if $self->can( 'url' );
 
     return $data;
   },
@@ -289,7 +281,7 @@ Data for passing to template processing function.
 
 =head1 VERSION
 
-version 1.4
+version 1.5
 
 =head1 AUTHOR
 

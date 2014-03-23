@@ -2,10 +2,7 @@
 
 
 package HiD::Pager;
-$HiD::Pager::VERSION = '1.4';
-BEGIN {
-  $HiD::Pager::AUTHORITY = 'cpan:GENEHACK';
-}
+$HiD::Pager::VERSION = '1.5';
 use Moose;
 # note: we also do 'with HiD::Role::DoesLogging', just later on because reasons.
 
@@ -259,7 +256,7 @@ Returns the URL for the previous page in the set.
 
 =head1 VERSION
 
-version 1.4
+version 1.5
 
 =head1 AUTHOR
 

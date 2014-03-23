@@ -2,10 +2,7 @@
 
 
 package HiD::Processor::Handlebars;
-$HiD::Processor::Handlebars::VERSION = '1.4';
-BEGIN {
-  $HiD::Processor::Handlebars::AUTHORITY = 'cpan:GENEHACK';
-}
+$HiD::Processor::Handlebars::VERSION = '1.5';
 use Moose;
 extends 'HiD::Processor';
 use namespace::autoclean;
@@ -68,7 +65,7 @@ Wraps up a L<Text::Handlebars> object and allows it to be used during HiD public
 
 =head1 VERSION
 
-version 1.4
+version 1.5
 
 =head1 AUTHOR
 

@@ -2,10 +2,7 @@
 
 
 package HiD::File;
-$HiD::File::VERSION = '1.4';
-BEGIN {
-  $HiD::File::AUTHORITY = 'cpan:GENEHACK';
-}
+$HiD::File::VERSION = '1.5';
 use Moose;
 with 'HiD::Role::IsPublished';
 use namespace::autoclean;
@@ -76,7 +73,7 @@ well if you're trying to figure out how an object from this class works.
 
 =head1 VERSION
 
-version 1.4
+version 1.5
 
 =head1 AUTHOR
 
