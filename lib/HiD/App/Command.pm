@@ -2,7 +2,7 @@
 
 
 package HiD::App::Command;
-$HiD::App::Command::VERSION = '1.5';
+$HiD::App::Command::VERSION = '1.7';
 use Moose;
 extends 'MooseX::App::Cmd::Command';
 use namespace::autoclean;
@@ -106,7 +106,7 @@ Defaults to './_config.yml'
 
 =head1 VERSION
 
-version 1.5
+version 1.7
 
 =head1 AUTHOR
 

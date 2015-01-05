@@ -2,7 +2,7 @@
 
 
 package HiD::App::Command::server;
-$HiD::App::Command::server::VERSION = '1.5';
+$HiD::App::Command::server::VERSION = '1.7';
 use Moose;
 extends 'HiD::App::Command';
 with 'HiD::Role::PublishesDrafts';
@@ -18,6 +18,8 @@ use feature     qw/ unicode_strings /;
 
 use namespace::autoclean;
 
+use Class::Load      qw/ :all /;
+use Plack::Builder;
 use Plack::Runner;
 
 
@@ -29,6 +31,22 @@ has auto_refresh => (
   documentation => 'auto re-publish when source changes, Default=False',
   lazy          => 1,
   default       => 0,
+);
+
+
+has clean => (
+  is          => 'ro' ,
+  isa         => 'Bool' ,
+  cmd_aliases => 'C' ,
+  traits      => [ 'Getopt' ] ,
+);
+
+
+has debug => (
+  is          => 'ro' ,
+  isa         => 'Bool' ,
+  cmd_aliases => 'D' ,
+  traits      => [ 'Getopt' ] ,
 );
 
 
@@ -88,6 +106,19 @@ sub _run {
     };
   }
 
+  if ( $self->debug ) {
+    if ( try_load_class( 'Plack::Middleware::DebugLogging' )) {
+      $app = builder {
+        enable_if { $ENV{PLACK_ENV} eq 'development' } 'DebugLogging';
+        $app;
+      };
+    }
+    else {
+      print STDERR "*** Plack::Middleware::DebugLogging required for debug logging.\n";
+      print STDERR "*** Continuing with normal logging.\n";
+    }
+  }
+
   my $runner = Plack::Runner->new;
   $runner->parse_options(%args);
   $runner->run($app);
@@ -145,6 +176,14 @@ Start a Plack-based web server that serves your C<destination> directory.
 
 Automatically refresh result when source file/dir changed, just likey jekyll
 
+=head2 clean
+
+Remove any existing site directory prior to the publication run
+
+=head2 debug
+
+Emit debug-style logging for requests
+
 =head2 port
 
 Port number to bind. Defaults to 5000.
@@ -156,7 +195,7 @@ sub commands.
 
 =head1 VERSION
 
-version 1.5
+version 1.7
 
 =head1 AUTHOR
 

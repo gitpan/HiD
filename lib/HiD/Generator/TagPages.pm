@@ -2,7 +2,7 @@
 
 
 package HiD::Generator::TagPages;
-$HiD::Generator::TagPages::VERSION = '1.5';
+$HiD::Generator::TagPages::VERSION = '1.7';
 use Moose;
 with 'HiD::Generator';
 
@@ -85,7 +85,7 @@ directory and modifying it directly.
 
 =head1 VERSION
 
-version 1.5
+version 1.7
 
 =head1 AUTHOR
 

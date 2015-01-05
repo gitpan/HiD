@@ -2,7 +2,7 @@
 
 
 package HiD::Role::IsPost;
-$HiD::Role::IsPost::VERSION = '1.5';
+$HiD::Role::IsPost::VERSION = '1.7';
 use Moose::Role;
 use namespace::autoclean;
 
@@ -292,7 +292,7 @@ folder or not.
 
 =head1 VERSION
 
-version 1.5
+version 1.7
 
 =head1 AUTHOR
 

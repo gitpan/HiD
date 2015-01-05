@@ -2,7 +2,7 @@
 
 
 package HiD::App::Command::config;
-$HiD::App::Command::config::VERSION = '1.5';
+$HiD::App::Command::config::VERSION = '1.7';
 use Moose;
 extends 'HiD::App::Command';
 use namespace::autoclean;
@@ -68,7 +68,7 @@ sub commands.
 
 =head1 VERSION
 
-version 1.5
+version 1.7
 
 =head1 AUTHOR
 

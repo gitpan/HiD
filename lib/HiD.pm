@@ -2,7 +2,7 @@
 
 
 package HiD;
-$HiD::VERSION = '1.5';
+$HiD::VERSION = '1.7';
 use Moose;
 use namespace::autoclean;
 # note: we also do 'with HiD::Role::DoesLogging', just later on because reasons.
@@ -87,7 +87,7 @@ sub _build_config {
   }
 
   $config_loaded or $config = {}
-    and warn( 'Could not read configuration. Using defaults (and options).' );
+    and warn( "Could not read configuration. Using defaults (and options).\n" );
 
   return {
     %{ $self->default_config } ,
@@ -493,14 +493,16 @@ has processor_args => (
   default => sub {
     my $self = shift;
 
-    return $self->get_config( 'processor_args' ) if
-      defined $self->get_config( 'processor_args' );
+    my $processor_args = defined $self->get_config('processor_args') ? $self->get_config('processor_args') : {};
 
-    my @path = ( $self->layout_dir );
-    push @path , $self->include_dir
-      if defined $self->include_dir;
+    if(ref $processor_args eq 'HASH' && !exists $processor_args->{path}) {
+        my @path = ( $self->layout_dir );
+        push @path , $self->include_dir
+          if defined $self->include_dir;
+        $processor_args->{path} = \@path;
+    }
 
-    return { path => \@path };
+    return $processor_args;
   },
 );
 
@@ -985,7 +987,7 @@ L<StaticVolt>
 
 =head1 VERSION
 
-version 1.5
+version 1.7
 
 =head1 AUTHOR
 

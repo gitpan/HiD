@@ -2,7 +2,7 @@
 
 
 package HiD::Processor::Handlebars;
-$HiD::Processor::Handlebars::VERSION = '1.5';
+$HiD::Processor::Handlebars::VERSION = '1.7';
 use Moose;
 extends 'HiD::Processor';
 use namespace::autoclean;
@@ -65,7 +65,7 @@ Wraps up a L<Text::Handlebars> object and allows it to be used during HiD public
 
 =head1 VERSION
 
-version 1.5
+version 1.7
 
 =head1 AUTHOR
 

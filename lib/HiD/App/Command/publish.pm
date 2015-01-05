@@ -2,7 +2,7 @@
 
 
 package HiD::App::Command::publish;
-$HiD::App::Command::publish::VERSION = '1.5';
+$HiD::App::Command::publish::VERSION = '1.7';
 use Moose;
 extends 'HiD::App::Command';
 with 'HiD::Role::PublishesDrafts';
@@ -94,7 +94,7 @@ sub commands.
 
 =head1 VERSION
 
-version 1.5
+version 1.7
 
 =head1 AUTHOR
 

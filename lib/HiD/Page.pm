@@ -2,7 +2,7 @@
 
 
 package HiD::Page;
-$HiD::Page::VERSION = '1.5';
+$HiD::Page::VERSION = '1.7';
 use Moose;
 with 'HiD::Role::IsConverted';
 with 'HiD::Role::IsPublished';
@@ -109,7 +109,7 @@ object from this class works.
 
 =head1 VERSION
 
-version 1.5
+version 1.7
 
 =head1 AUTHOR
 

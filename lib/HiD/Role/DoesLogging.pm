@@ -1,7 +1,7 @@
 #ABSTRACT: Logging role
 
 package HiD::Role::DoesLogging;
-$HiD::Role::DoesLogging::VERSION = '1.5';
+$HiD::Role::DoesLogging::VERSION = '1.7';
 use Moose::Role;
 
 use Log::Log4perl;
@@ -96,7 +96,7 @@ Log4perl object for logging. Handles:
 
 =head1 VERSION
 
-version 1.5
+version 1.7
 
 =head1 AUTHOR
 

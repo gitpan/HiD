@@ -50,7 +50,7 @@ Hashref of standard configuration options. The default config is:
 
 Directory to write output files into.
 
-__N.B.:__ If it doesn't exist and is needed, it will be created.
+**N.B.:** If it doesn't exist and is needed, it will be created.
 
 ## draft\_post\_file\_regex
 
@@ -248,7 +248,7 @@ Process files and generate output per the active configuration.
 
 # VERSION
 
-version 1.5
+version 1.7
 
 # AUTHOR
 

@@ -2,7 +2,7 @@
 
 
 package HiD::Role::IsConverted;
-$HiD::Role::IsConverted::VERSION = '1.5';
+$HiD::Role::IsConverted::VERSION = '1.7';
 use Moose::Role;
 use namespace::autoclean;
 
@@ -281,7 +281,7 @@ Data for passing to template processing function.
 
 =head1 VERSION
 
-version 1.5
+version 1.7
 
 =head1 AUTHOR
 

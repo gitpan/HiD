@@ -1,7 +1,7 @@
 #ABSTRACT: Role for the 'publishes_drafts' attr
 
 package HiD::Role::PublishesDrafts;
-$HiD::Role::PublishesDrafts::VERSION = '1.5';
+$HiD::Role::PublishesDrafts::VERSION = '1.7';
 use Moose::Role;
 
 requires '_run';
@@ -37,7 +37,7 @@ config key).
 
 =head1 VERSION
 
-version 1.5
+version 1.7
 
 =head1 AUTHOR
 

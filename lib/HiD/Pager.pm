@@ -2,7 +2,7 @@
 
 
 package HiD::Pager;
-$HiD::Pager::VERSION = '1.5';
+$HiD::Pager::VERSION = '1.7';
 use Moose;
 # note: we also do 'with HiD::Role::DoesLogging', just later on because reasons.
 
@@ -256,7 +256,7 @@ Returns the URL for the previous page in the set.
 
 =head1 VERSION
 
-version 1.5
+version 1.7
 
 =head1 AUTHOR
 

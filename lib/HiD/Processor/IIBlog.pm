@@ -2,7 +2,7 @@
 
 
 package HiD::Processor::IIBlog;
-$HiD::Processor::IIBlog::VERSION = '1.5';
+$HiD::Processor::IIBlog::VERSION = '1.7';
 use Moose;
 extends 'HiD::Processor';
 use namespace::autoclean;
@@ -78,7 +78,7 @@ publication.
 
 =head1 VERSION
 
-version 1.5
+version 1.7
 
 =head1 AUTHOR
 

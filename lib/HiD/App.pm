@@ -2,7 +2,7 @@
 
 
 package HiD::App;
-$HiD::App::VERSION = '1.5';
+$HiD::App::VERSION = '1.7';
 use Moose;
 extends 'MooseX::App::Cmd';
 use namespace::autoclean;
@@ -15,7 +15,7 @@ use open        qw/ :std  :utf8     /;
 use charnames   qw/ :full           /;
 use feature     qw/ unicode_strings /;
 
-sub default_command { 'publish' };
+sub default_command { 'help' };
 
 __PACKAGE__->meta->make_immutable;
 1;
@@ -36,7 +36,7 @@ See C<perldoc hid> for usage information.
 
 =head1 VERSION
 
-version 1.5
+version 1.7
 
 =head1 AUTHOR
 

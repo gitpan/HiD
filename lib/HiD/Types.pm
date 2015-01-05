@@ -2,7 +2,7 @@
 
 
 package HiD::Types;
-$HiD::Types::VERSION = '1.5';
+$HiD::Types::VERSION = '1.7';
 use 5.014;
 use utf8;
 use strict;
@@ -67,7 +67,7 @@ Type constraints for HiD.
 
 =head1 VERSION
 
-version 1.5
+version 1.7
 
 =head1 AUTHOR
 

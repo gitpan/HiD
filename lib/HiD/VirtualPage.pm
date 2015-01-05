@@ -2,7 +2,7 @@
 
 
 package HiD::VirtualPage;
-$HiD::VirtualPage::VERSION = '1.5';
+$HiD::VirtualPage::VERSION = '1.7';
 use Moose;
 use namespace::autoclean;
 
@@ -84,7 +84,7 @@ Publish -- write out to disk -- this data from this object.
 
 =head1 VERSION
 
-version 1.5
+version 1.7
 
 =head1 AUTHOR
 

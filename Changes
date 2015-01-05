@@ -1,5 +1,17 @@
 Revision history for HiD
 
+1.7       2015-01-05 11:49:03-08:00 America/Los_Angeles
+
+        Make 'help' the default subcommand
+
+        Allow creation of category pages in addition to tag pages. (Brad Lhotsky)
+
+        Fixes for Template processor (Brad Lhotsky)
+
+        Add 'debug' option to 'server' command
+
+        Fix dumb issue with 'server' command
+
 1.5       2014-03-22 17:50:58-07:00 America/Los_Angeles
 
         Revised dist.ini so generated Makefile.PL will be maintained

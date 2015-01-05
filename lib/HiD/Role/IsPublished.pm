@@ -2,7 +2,7 @@
 
 
 package HiD::Role::IsPublished;
-$HiD::Role::IsPublished::VERSION = '1.5';
+$HiD::Role::IsPublished::VERSION = '1.7';
 use Moose::Role;
 use namespace::autoclean;
 
@@ -189,7 +189,7 @@ The URL to the output path for the written file.
 
 =head1 VERSION
 
-version 1.5
+version 1.7
 
 =head1 AUTHOR
 

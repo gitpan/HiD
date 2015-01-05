@@ -2,7 +2,7 @@
 
 
 package HiD::Layout;
-$HiD::Layout::VERSION = '1.5';
+$HiD::Layout::VERSION = '1.7';
 use Moose;
 use namespace::autoclean;
 
@@ -203,7 +203,7 @@ Will recurse into embedded layouts as needed.
 
 =head1 VERSION
 
-version 1.5
+version 1.7
 
 =head1 AUTHOR
 

@@ -2,7 +2,7 @@
 
 
 package HiD::Plugin;
-$HiD::Plugin::VERSION = '1.5';
+$HiD::Plugin::VERSION = '1.7';
 use Moose;
 use namespace::autoclean;
 
@@ -43,7 +43,7 @@ Base class for plugin object
 
 =head1 VERSION
 
-version 1.5
+version 1.7
 
 =head1 AUTHOR
 

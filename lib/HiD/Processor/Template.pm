@@ -2,7 +2,7 @@
 
 
 package HiD::Processor::Template;
-$HiD::Processor::Template::VERSION = '1.5';
+$HiD::Processor::Template::VERSION = '1.7';
 use Moose;
 extends 'HiD::Processor';
 use namespace::autoclean;
@@ -32,7 +32,37 @@ sub BUILDARGS {
 
   my %args = ( ref $_[0] && ref $_[0] eq 'HASH' ) ? %{ $_[0] } : @_;
 
+  # Try to resolve the include path for Template
+  my @path = ();
+
+  # It might be set in the configuration file
+  if(exists $args{INCLUDE_PATH}) {
+      # Try to evaluate as an array
+      my $rc = eval { @path = @{ $args{INCLUDE_PATH} }; 1; };
+      # If that fails, treat as a string and split ':'
+      @path = split /:/, $args{INCLUDE_PATH}
+        if !$rc;
+  }
+
+  # If we got a default 'path' element, append it to the list.
+  if(exists $args{path}) {
+      # It should be an array
+      my $default_path = delete $args{path};
+      my $rc = eval { push @path, @{ $default_path }; 1; };
+      # If it's not, split on the ':' in the string
+      push @path, split /:/, $default_path
+          if !$rc;
+  }
+
+  # Finally set the path to the merged path
+  $args{INCLUDE_PATH} = \@path;
+
   return { tt => Template->new( %args ) };
+}
+
+
+sub error {
+    die $Template::ERROR;
 }
 
 __PACKAGE__->meta->make_immutable;
@@ -56,9 +86,15 @@ HiD::Processor::Template - Use Template Toolkit to publish your HiD files
 
 Wraps up a L<Template> object and allows it to be used during HiD publication.
 
+=head1 METHODS
+
+=head2 error
+
+Display the template error message.
+
 =head1 VERSION
 
-version 1.5
+version 1.7
 
 =head1 AUTHOR
 

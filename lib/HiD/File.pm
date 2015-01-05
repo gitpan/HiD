@@ -2,7 +2,7 @@
 
 
 package HiD::File;
-$HiD::File::VERSION = '1.5';
+$HiD::File::VERSION = '1.7';
 use Moose;
 with 'HiD::Role::IsPublished';
 use namespace::autoclean;
@@ -73,7 +73,7 @@ well if you're trying to figure out how an object from this class works.
 
 =head1 VERSION
 
-version 1.5
+version 1.7
 
 =head1 AUTHOR
 
